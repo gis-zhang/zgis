@@ -1,0 +1,45 @@
+.leaflet-texttip {
+	background: rgb(54, 54, 54);
+	background: rgba(0, 0, 0, 0.5);
+	border: 1px solid transparent;
+	-webkit-border-radius: 4px;
+	        border-radius: 4px;
+	color: #fff;
+	font: 12px/18px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	margin-left: 20px;
+	margin-top: -21px;
+	padding: 4px 8px;
+	position: absolute;
+	visibility: hidden;
+	white-space: nowrap;
+	z-index: 6;
+}
+
+.leaflet-texttip:before {
+	border-right: 6px solid black;
+	border-right-color: rgba(0, 0, 0, 0.5);
+	border-top: 6px solid transparent;
+	border-bottom: 6px solid transparent;
+	content: "";
+	position: absolute;
+	top: 7px;
+	left: -7px;
+}
+
+.leaflet-error-texttip {
+	background-color: #F2DEDE;
+	border: 1px solid #E6B6BD;
+	color: #B94A48;
+}
+
+.leaflet-error-texttip:before {
+	border-right-color: #E6B6BD;
+}
+
+.leaflet-texttip-single {
+	margin-top: -12px
+}
+
+.leaflet-texttip-subtext {
+	color: #f8d5e4;
+}

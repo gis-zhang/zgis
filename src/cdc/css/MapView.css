@@ -1,0 +1,142 @@
+.zmap-toolbar-container {
+    overflow: hidden;
+    position: absolute;
+    width: 300px;
+    height: 30px;
+    left: 150px;
+    top: 20px;
+    display:flex;
+    /*-ms-touch-action: none;*/
+    /*cursor: -webkit-grab;*/
+    /*cursor:    -moz-grab;*/
+    /*background: #ddd;*/
+    /*outline: 0;*/
+    /*font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;*/
+}
+
+.zmap-toolbar-card-shadow {
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+}
+.zmap-toolbar-card {
+    /*position: fixed;
+    left: 150px;
+    bottom: 20px;*/
+    cursor: pointer;
+    border-radius: 4px;
+    /*background-color: rgba(200, 208, 198, 0.7);*/
+    background-color: rgba(220, 228, 228, 0.85);
+    font-size: 15px;
+}
+.zmap-toolbar-card i{
+    margin: auto 7px;
+}
+.zmap-toolbar-divide{
+    /*font-weight: normal !important;
+    font-size: 25px;*/
+}
+
+.zmap-toolbar-icon {
+    display: inline-block;
+    font-family: Ionicons;
+    speak: none;
+    font-style: normal;
+    font-weight: 400;
+    font-variant: normal;
+    text-transform: none;
+    text-rendering: auto;
+    width: 40px;
+    height: 20px;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}
+
+.zmap-toolbar-icon div{
+    width:22px;
+    height:20px;
+}
+/*
+.zmap-toolbar-icon-plus-round:before {
+    content: "\F217";
+    box-sizing: border-box;
+}
+
+.zmap-toolbar-icon-minus-round:before {
+    content: "\F208";
+    box-sizing: border-box;
+}
+
+.zmap-toolbar-icon-divide:before {
+    content: "\F397";
+    box-sizing: border-box;
+}
+
+.zmap-toolbar-icon-rotate-cw:before {
+    content: "\F21C";
+    box-sizing: border-box;
+}
+
+.zmap-toolbar-icon-arrow-up-c:before {
+    content: "\F10E";
+    box-sizing: border-box;
+}*/
+
+/*:after, :before {
+    box-sizing: border-box;
+}*/
+
+.zmap-floor-container {
+    overflow: hidden;
+    position: absolute;
+    width: 60px;
+    left: 20px;
+    top: 20px;
+    cursor: pointer;
+    text-align: center;
+    padding: 8px 5px;
+    /*-ms-touch-action: none;*/
+    /*cursor: -webkit-grab;*/
+    /*cursor:    -moz-grab;*/
+    /*background: #ddd;*/
+    /*outline: 0;*/
+    /*font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;*/
+}
+
+.zmap-floor-container span {
+    margin: 5px auto;
+    padding: 0;
+    word-wrap: break-word;
+}
+
+.zmap-floor-container ul {
+    margin: 0px auto;
+    padding: 0;
+}
+
+.zmap-floor-container li {
+    margin: 5px auto;
+    height: 20px;
+}
+
+.zmap-floor-container a {
+    color: black;
+    background: 0 0;
+    text-decoration: none;
+    outline: 0;
+    cursor: pointer;
+}
+
+.zmap-floor-card-shadow {
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+}
+
+.zmap-floor-card {
+    /*cursor: pointer;*/
+    border-radius: 4px;
+    /*background-color: rgba(200, 208, 198, 0.7);*/
+    background-color: rgba(226, 234, 225, 0.85);
+    font-size: 15px;
+}
+
+.zmap-floor-active{
+    border-left: 2px solid #3091f2;
+}
