@@ -1,0 +1,315 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=gb2312">
+    <script type="text/JavaScript" src="../src/lib/glMatrix/gl-matrix.js"></script>
+    <script src="../src/lib/stats.min.js"></script>
+
+    <script id="shader-vs" type="x-shader/x-vertex">
+attribute vec3 v3Position;
+uniform mat4 um4Rotate;
+void main(void)
+{
+    gl_Position = um4Rotate * vec4(v3Position, 1.0);
+    //gl_Position = vec4(v3Position, 1.0);
+}
+</script>
+
+    <script id="shader-fs" type="x-shader/x-fragment">
+//#ifdef GL_FRAGMENT_PRECISION_HIGH
+//    precision highp float;
+//#else
+//    precision mediump float;
+//#endif
+
+void main(void)
+{
+    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+</script>
+
+    <script type="application/javascript">
+        var RenderMonitor = (function () {
+            var stats = null;
+            var appended = false;
+
+            return {
+                update: function(){
+                    if(!appended){
+                        stats = new Stats();
+                        stats.domElement.style.position = 'absolute';
+                        stats.domElement.style.top = '0px';
+                        document.body.appendChild( stats.domElement );
+                        appended = true;
+                    }
+
+                    stats.update();
+                }
+            }
+        })();
+
+    </script>
+
+    <script>
+        function ShaderSourceFromScript(scriptID)
+        {
+            var shaderScript = document.getElementById(scriptID);
+            if (shaderScript == null) return "";
+
+            var sourceCode = "";
+            var child = shaderScript.firstChild;
+            while (child)
+            {
+                if (child.nodeType == child.TEXT_NODE ) sourceCode += child.textContent;
+                child = child.nextSibling;
+            }
+
+            return sourceCode;
+        }
+
+        var webgl = null;
+        var vertexShaderObject = null;
+        var fragmentShaderObject = null;
+        var programObject = null;
+        var triangleBuffer = null;
+        var indexBuffer = null;
+        var v3PositionIndex = 0;
+//        var textureObject = null;
+//        var samplerIndex = -1;
+        var interval = 300;
+        var angle = 0;
+        var um4RotateIndex = -1;
+
+        var indexArrayData = [];
+        var faceCount = 50000;
+
+        function LoadData()
+        {
+            var initPointData = [
+                0.0, 0.5, 0.0,//上顶点
+                -0.5, -0.5, 0.0,//左顶点
+                0.5, 0.0, 0.0];//右顶点
+            var jsArrayData = [];
+
+
+            for(var i = 0; i < faceCount; i++){
+                var start = i * 9;
+
+                for(var j = 0; j < 9; j++){
+                    //jsArrayData[start + j] = initPointData[j];  //Math.random()
+                    jsArrayData[start + j] = (Math.random() - 0.5) * 2;
+                }
+            }
+
+            var width = 2500, height = 1000;
+//            jsArrayData = getSquarePoints(width, height);
+//            faceCount = width * height * 2;
+
+            var data = getIndexedSquarePoints(width, height);
+            jsArrayData = data.data;
+            indexArrayData = data.index;
+
+            faceCount = Math.round(indexArrayData.length / 3);
+
+            console.info("faceCount:" + faceCount + ", pointsCount:" + jsArrayData.length / 3);
+            triangleBuffer = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, triangleBuffer);
+            webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array(jsArrayData), webgl.STATIC_DRAW);
+
+//            for(var i = 0; i < faceCount; i++){
+//                var start = i * 3;
+//
+//                for(var j = 0; j < 3; j++){
+//                    indexArrayData[start + j] = (start + j) % jsArrayCount;
+//                }
+//            }
+            // 生成缓存对象
+            indexBuffer = webgl.createBuffer();
+            // 绑定缓存
+            webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+            // 向缓存中写入数据
+            webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, new Int32Array(indexArrayData), webgl.STATIC_DRAW);
+            // 将缓存的绑定无效化
+            webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, null);
+
+//            textureObject = webgl.createTexture();
+//            webgl.bindTexture(webgl.TEXTURE_2D, textureObject);
+//            var img = document.getElementById('myTexture');
+//            webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGB, webgl.RGB, webgl.UNSIGNED_BYTE, img);
+
+            return 0;
+        }
+
+//        function getSquarePoints(xSplit, ySplit){
+//            var xMinLimit  = -1,
+//                    xMaxLimit = 1,
+//                    yMinLimit  = -1,
+//                    yMaxLimit = 1,
+//                    squarePoints = [],
+//                    unitWidth = (xMaxLimit - xMinLimit) / xSplit,
+//                    unitHeight = (yMaxLimit - yMinLimit) / ySplit;
+//
+//            for(var i = 0; i < xSplit; i++){
+//                for(var j = 0; j < ySplit; j++){
+//                    var curMinX = xMinLimit + unitWidth * i,
+//                            curMaxX = xMinLimit + unitWidth * (i + 1),
+//                            curMinY = yMinLimit + unitHeight * j,
+//                            curMaxY = yMinLimit + unitHeight * (j + 1);
+//
+//                    squarePoints.push(curMinX);
+//                    squarePoints.push(curMinY);
+//                    squarePoints.push(0);
+//                    squarePoints.push(curMaxX);
+//                    squarePoints.push(curMinY);
+//                    squarePoints.push(0);
+//                    squarePoints.push(curMinX);
+//                    squarePoints.push(curMaxY);
+//                    squarePoints.push(0);
+//                    squarePoints.push(curMaxX);
+//                    squarePoints.push(curMinY);
+//                    squarePoints.push(0);
+//                    squarePoints.push(curMaxX);
+//                    squarePoints.push(curMaxY);
+//                    squarePoints.push(0);
+//                    squarePoints.push(curMinX);
+//                    squarePoints.push(curMaxY);
+//                    squarePoints.push(0);
+//                }
+//            }
+//
+//            return squarePoints;
+//        }
+
+        function getIndexedSquarePoints(xSplit, ySplit){
+            var xMinLimit  = -1,
+                    xMaxLimit = 1,
+                    yMinLimit  = -1,
+                    yMaxLimit = 1,
+                    squarePoints = [],
+                    squareIndex = [],
+                    unitWidth = (xMaxLimit - xMinLimit) / xSplit,
+                    unitHeight = (yMaxLimit - yMinLimit) / ySplit;
+
+            for(var i = 0; i <= xSplit; i++){
+                for(var j = 0; j <= ySplit; j++){
+                    var curX = xMinLimit + unitWidth * i,
+                            curY = yMinLimit + unitHeight * j;
+
+                    squarePoints.push(curX);
+                    squarePoints.push(curY);
+                    squarePoints.push(0);
+
+                    if(i > 0 && j > 0){
+                        squareIndex.push(i * ySplit + j);
+                        squareIndex.push(i * ySplit + j - 1);
+                        squareIndex.push((i - 1) * ySplit + j - 1);
+
+                        squareIndex.push(i * ySplit + j);
+                        squareIndex.push((i - 1) * ySplit + j - 1);
+                        squareIndex.push((i - 1) * ySplit + j);
+                    }
+                }
+            }
+
+            return {
+                data: squarePoints,
+                index: squareIndex
+            };
+        }
+
+        function RenderScene()
+        {
+            webgl.clearColor(1.0, 1.0, 0.0, 1.0);
+            webgl.clear(webgl.COLOR_BUFFER_BIT);
+
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, triangleBuffer);
+            webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+            webgl.vertexAttribPointer(v3PositionIndex, 3, webgl.FLOAT, false, 0, 0);
+            webgl.enableVertexAttribArray(v3PositionIndex);
+
+//            webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.NEAREST);
+//            webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.NEAREST);
+//            webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_WRAP_S, webgl.CLAMP_TO_EDGE);
+//            webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_WRAP_T, webgl.CLAMP_TO_EDGE);
+//
+//            webgl.activeTexture(webgl.TEXTURE0);
+//            webgl.bindTexture(webgl.TEXTURE_2D, textureObject);
+//            webgl.uniform1i(samplerIndex, 0);
+
+            var m4Rotate = mat4.create();
+            mat4.identity(m4Rotate);
+            mat4.rotateZ(m4Rotate, angle*Math.PI/180);
+            webgl.uniformMatrix4fv(um4RotateIndex, false, m4Rotate);
+
+//            webgl.drawArrays(webgl.TRIANGLES, 0, faceCount * 3);
+            var type = webgl.UNSIGNED_SHORT;
+            var ext = webgl.getExtension("OES_element_index_uint");
+
+            if(ext){
+                type = webgl.UNSIGNED_INT;
+            }
+
+            webgl.drawElements(webgl.TRIANGLES, indexArrayData.length, type, 0);
+            RenderMonitor.update();
+
+            requestAnimationFrame(RotateTriangle);
+        }
+
+        function RotateTriangle()
+        {
+            angle += 10;
+            if(angle >= 360) angle -= 360;
+
+            RenderScene();
+        }
+
+        function Init()
+        {
+            var myCanvasObject = document.getElementById('myCanvas');
+            webgl = myCanvasObject.getContext("experimental-webgl");
+
+            webgl.viewport(0, 0, myCanvasObject.clientWidth, myCanvasObject.clientHeight);
+
+            vertexShaderObject = webgl.createShader(webgl.VERTEX_SHADER);
+            fragmentShaderObject = webgl.createShader(webgl.FRAGMENT_SHADER);
+
+            webgl.shaderSource(vertexShaderObject, ShaderSourceFromScript("shader-vs"));
+            webgl.shaderSource(fragmentShaderObject, ShaderSourceFromScript("shader-fs"));
+
+            webgl.compileShader(vertexShaderObject);
+            webgl.compileShader(fragmentShaderObject);
+
+            if(!webgl.getShaderParameter(vertexShaderObject, webgl.COMPILE_STATUS)){alert(webgl.getShaderInfoLog(vertexShaderObject));return;}
+            if(!webgl.getShaderParameter(fragmentShaderObject, webgl.COMPILE_STATUS)){alert(webgl.getShaderInfoLog(fragmentShaderObject));return;}
+
+            programObject = webgl.createProgram();
+
+            webgl.attachShader(programObject, vertexShaderObject);
+            webgl.attachShader(programObject, fragmentShaderObject);
+
+            //webgl.bindAttribLocation(programObject, v3PositionIndex, "v3Position");
+
+            webgl.linkProgram(programObject);
+            if(!webgl.getProgramParameter(programObject, webgl.LINK_STATUS)){alert(webgl.getProgramInfoLog(programObject));return;}
+
+//            samplerIndex = webgl.getUniformLocation(programObject, "s_texture");
+            um4RotateIndex = webgl.getUniformLocation(programObject, "um4Rotate");
+            v3PositionIndex = webgl.getAttribLocation(programObject, 'v3Position');
+
+            webgl.useProgram(programObject);
+
+
+            if(LoadData() != 0){alert("error:LoadData()!");return;}
+
+
+//            window.setInterval("RotateTriangle()", interval);
+            requestAnimationFrame(RotateTriangle);
+        }
+    </script>
+</head>
+<body onload='Init()'>
+<!--<canvas id="myCanvas" style="border:1px solid red;" width='600px' height='450px'></canvas>-->
+<canvas id="myCanvas" style="border:1px solid red;" width='512px' height='400px'></canvas>
+<!--<canvas id="myCanvas" style="border:1px solid red;" width='100px' height='100px'></canvas>-->
+<!--<img id="myTexture" src='../src/zmap/image/grass.jpg'>-->
+</body>
+</html>

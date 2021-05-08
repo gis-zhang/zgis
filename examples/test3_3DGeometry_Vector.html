@@ -1,0 +1,488 @@
+﻿<html>
+<head>
+	<title>地图api测试示例-矢量数据</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../src/lib/leaflet-0.7.3/leaflet.css" />
+	<link rel="stylesheet" href="../dist/zmap.css" />
+	<link rel="stylesheet" href="../src/lib/leaflet-extend/control/L.TextIcon.js" />
+
+	<script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
+	<!--<script src="../src/lib/threejs/three.js"></script>-->
+	<script src="../src/lib/threejs_new/three.js"></script>
+	<script src="../src/lib/threejs/ConvexGeometry.js"></script>
+	<script src="../src/lib/threebsp/ThreeBSP.js"></script>
+	<!--<script src="../src/lib/leaflet-extend/control/Util.js"></script>-->
+	<!--<script src="../src/lib/leaflet-extend/layer/L.CustomTileLayer.js"></script>-->
+	<!--<script src="../src/lib/leaflet-extend/layer/layer.wmts-src.js"></script>-->
+	<!--<script src="../src/lib/leaflet-extend/layer/layer.tdt-src.js"></script>-->
+	<!--<script src="../src/lib/leaflet-plugin/Leaflet.zoomslider-0.6.1/src/L.Control.Zoomslider.js"></script>-->
+	<!--<script src="../src/lib/leaflet-extend/crs/L.CRS.CustomLevel.js"></script>-->
+	<!--<script src="../src/lib/leaflet-extend/control/L.Control.Layers.Custom.js"></script>-->
+	<!--<script src="../src/lib/leaflet-plugin/MiniMap/Control.MiniMap.min.js"></script>-->
+	<!--<script src="../src/lib/leaflet-extend/MapConfig.js" charset="GBK"></script>-->
+	<!--<script src="../src/lib/leaflet-extend/control/L.TextIcon.js"></script>-->
+	<!--<script src="../src/lib/leaflet-extend/Map.js"></script>-->
+	<script src="../dist/zmap-release.js"></script>
+	<!--<script src="http://localhost/mapapi/example/testdata_wkt13.js"></script>-->
+	<script src="../examples/data/testdata_wkt13.js"></script>
+	<!--<script src="../src/zmap/fonts/gentilis_bold.typeface.js"></script>-->
+	<!--<script src="../src/zmap/fonts/gentilis_regular.typeface.js"></script>-->
+	<!--<script src="../src/zmap/fonts/optimer_bold.typeface.js"></script>-->
+	<!--<script src="../src/zmap/fonts/optimer_regular.typeface.js"></script>-->
+	<!--<script src="../src/zmap/fonts/helvetiker_bold.typeface.js"></script>-->
+	<!--<script src="../src/zmap/fonts/helvetiker_regular.typeface.js"></script>-->
+	<!--<script src="../src/zmap/fonts/droid/droid_sans_regular.typeface.js"></script>-->
+	<!--<script src="../src/zmap/fonts/droid/droid_sans_bold.typeface.js"></script>-->
+	<!--<script src="../src/zmap/fonts/droid/droid_serif_regular.typeface.js"></script>-->
+	<!--<script src="../src/zmap/fonts/droid/droid_serif_bold.typeface.js"></script>-->
+
+	<script src="../src/lib/stats.min.js"></script>
+	<script>
+		var rotateX = 0, rotateY = 0; rotateZ = 0, map = null, sunH = 30, sunV = 45;
+
+		function load(){
+			//map = new ZMap('map', {sceneType: '3D', center:{x:120.293820214832, y:31.5801890000232}, initZoom: 18, maxZoom: 20});
+			//map = new ZMap('map', {sceneType: '3D', center:{x:117.01671, y:36.861610}, initZoom: 16, maxZoom: 20});
+			//map = new ZMap('map', {sceneType: '3D', center:{x:118.7169, y:32.0094}, initZoom: 18, maxZoom: 20});
+			map = new ZMap('map', {sceneType: '3D', center:{x:116.20815079757854, y:0.4148021879511387}, initZoom: 18, maxZoom: 20});
+			//map.rotateByEuler({x: 70, y:0, z:0});
+
+			var layer1 = new Z.TDTVectorLayer();
+			var layer2 = new Z.TDTVectorAnnoLayer();
+			var layer3 = new Z.TDTRasterLayer();
+			var layer4 = new Z.TDTRasterAnnoLayer();
+
+			map.addLayer(layer1, 0);
+			map.addLayer(layer2, 1);
+//		map.addLayer(layer3, 2, Z.LayerGroup.BaseBgLayer);
+//		map.addLayer(layer4, 3, Z.LayerGroup.BaseBgLayer);
+		}
+
+		function x_add(){
+			//rotateX += 5;
+			rotateX = 2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function x_sub(){
+//			rotateX -= 5;
+			rotateX = -2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+//		function y_add(){
+////			rotateY += 5;
+//			rotateY = 5;
+//			rotateX = 0;
+//			rotateZ = 0;
+//			refresh();
+//		}
+//
+//		function y_sub(){
+////			rotateY -= 5;
+//			rotateY = -5;
+//			rotateX = 0;
+//			rotateZ = 0;
+//			refresh();
+//		}
+
+		function z_add(){
+			//rotateZ += 5;
+			rotateZ = 5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+		function z_sub(){
+			//rotateZ -= 5;
+			rotateZ = -5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+//		function x_pan_add(){
+//			map.panBy(10);
+//			showBbox();
+//		}
+//
+//		function x_pan_sub(){
+//			map.panBy(-10);
+//			showBbox();
+//		}
+//
+//		function y_pan_add(){
+//			//map._scene.translateByGL({x: 0, y:1, z:0});
+//			map.panBy(0, 50);
+//			showBbox();
+//		}
+//
+//		function y_pan_sub(){
+//			//map._scene.translateByGL({x: 0, y:-1, z:0});
+//			map.panBy(0, -50);
+//			showBbox();
+//		}
+
+//		function z_pan_add(){
+//			//map._scene.translateByGL({x: 0, y:0, z:1});
+//			//map.panBy(0, -50);
+//			showBbox();
+//		}
+//
+//		function z_pan_sub(){
+//			//map._scene.translateByGL({x: 0, y:0, z:-1});
+//			//map.panBy(0, -50);
+//			showBbox();
+//		}
+
+//		function sun_up(){
+//			sunV += 5;
+//			map.setSunLight({h: sunH, v:sunV});
+//		}
+//
+//		function sun_down(){
+//			sunV -= 5;
+//			map.setSunLight({h: sunH, v:sunV});
+//		}
+//
+//		function clickMap(event){
+//			var point = map.screenPointToLatLng(new Z.Point(event.clientX,event.clientY));
+//			alert(point.lat + "," + point.lng);
+//		}
+
+//		var spriteContainer;
+//		var i = 1;
+//		function refreshSprite(){
+////			var mapRotate = map._scene.getRotateByRad();
+////			spriteContainer.setRotationFromQuaternion(new THREE.Quaternion(mapRotate.x, mapRotate.y, mapRotate.z, mapRotate.w));
+//		}
+
+		function refresh(){
+			//map._scene.setRotationByEuler({x: rotateX, y:rotateY, z:rotateZ});
+			map.rotateByEuler({x: rotateX, y:rotateY, z:rotateZ});
+			//map._scene.render();
+
+//			refreshSprite();
+//			map._scene.refresh();
+			//showBbox();
+		}
+
+//		function showBbox(){
+//			var visibleBounds = map._scene._sceneRender.getVisibleGLBounds();
+//			var visibleLatLngBounds = map.getContentBounds();
+//			document.getElementById("aaa").innerHTML = "Left:x=" + visibleBounds.getBottomLeft().x + ";y=" + visibleBounds.getBottomLeft().y + ";z=" + visibleBounds.getBottomLeft().z +
+//					"。Right:x=" + visibleBounds.getTopRight().x + ";y=" + visibleBounds.getTopRight().y + ";z=" + visibleBounds.getTopRight().z;
+//			document.getElementById("bbb").innerHTML = "Left:x=" + visibleLatLngBounds.getWest() + ";y=" + visibleLatLngBounds.getSouth() + ";z=" + visibleLatLngBounds.getBottom() +
+//					"。Right:x=" + visibleLatLngBounds.getEast() + ";y=" + visibleLatLngBounds.getNorth() + ";z=" + visibleLatLngBounds.getTop();
+//		}
+
+		function reset(){
+			map._scene._sceneRender.resetCamera();
+			map._scene._sceneRender.render();
+		}
+
+		function zoomIn(){
+			map.zoomIn();
+		}
+
+		function zoomOut(){
+			map.zoomOut();
+		}
+
+//		var added = false;
+
+
+		var vectorLayer = null;
+
+		function addPolyline(){
+			var geom = new Z.Polyline([[[30,120], [30,121], [28, 110]], [[48,101], [29,100], [39,110]]]);
+			var shape = new Z.Feature({id:'polyline_id112', name: 'polyline_name1234'}, geom);
+			var symbol = new Z.PolylineSymbol({color:'#aaaa00', width:2});
+			var graphic = new Z.Graphic(shape, symbol, {tip: "#{id}", title: "#{name}"});
+
+			if(!vectorLayer){
+				vectorLayer = new Z.TerrainGraphicLayer({enableTip: true});
+				//map.addLayer(vectorLayer, 1, Z.LayerGroup.BaseOverLayer);
+				map.addLayer(vectorLayer, 3);
+			}
+			map.setZoom(4);
+			vectorLayer.addGraphic(graphic);
+
+		}
+
+		var polygonLayer = null;
+//		function addPolygon(){
+//			var geom = new Z.Polygon([[[35,93], [25,93], [25, 110], [35, 110], [35, 93]], [[32,100], [30,105], [28,100], [30, 95], [32,100]]]);
+//			//var geom = new Z.Polygon([[[33,95], [27,95], [27, 105], [33, 105], [33, 95]], [[31,100], [30,102], [29,100], [30, 98], [31,100]]]);
+//			//var geom = new Z.Polygon([[[33,95], [27,95], [27, 105], [33, 105], [33, 95]]]);
+//			var shape = new Z.Feature({id:'polygon_id112', name: 'polygon_name1234'}, geom);
+//			var symbol = new Z.PolygonSymbol({
+//						polylineSymbol: new Z.PolylineSymbol({color:'#aa00aa', width:2, opacity: 0.7}),
+//						fillSymbol: new Z.PictureFillSymbol({url:'http://localhost:8080/zmap/src/zmap/image/tree.jpg', opacity: 0.5}),
+//					hideFill: false,
+//					hidePolyline: true}
+//			);
+//			//var graphic = new Z.Graphic(shape, symbol, {tip: "321", title: "aaa"});
+//			var graphic = new Z.Graphic(shape, symbol, {tip: "#{id}", title: "#{name}"});
+//
+//			if(!polygonLayer){
+//				polygonLayer = new Z.TerrainGraphicLayer({enableTip: true, enableTitle: false});
+//				map.addLayer(polygonLayer, 4);
+//			}
+//
+//			polygonLayer.addGraphic(graphic);
+//		}
+
+		function addPolygon(){
+			var symbol = new Z.PolygonSymbol({
+						polylineSymbol: new Z.PolylineSymbol({color:'#aaaa00', width:1, opacity: 0.7}),
+						//fillSymbol: new Z.PictureFillSymbol({url:'http://localhost:8080/zmap/src/zmap/image/tree.jpg', opacity: 0.5}),
+						fillSymbol: new Z.SimpleFillSymbol({color:'#aa0000', opacity: 0.5}),
+						hideFill: false,
+						hidePolyline: false}
+			);
+
+			var mouseOverSymbol = new Z.PolygonSymbol({
+				polylineSymbol: new Z.PolylineSymbol({color:'#0000aa', width:2, opacity: 0.7}),
+				fillSymbol: new Z.SimpleFillSymbol({color:'#00aaaa', opacity: 0.8}),
+				hideFill: false,
+				hidePolyline: false});
+
+			var markerSymbol = new Z.PictureMarkerSymbol(
+					{offset: new Z.Point(0, 0, 0), width:25, height:41,
+						anchor:'bottomCenter',
+						//url: "http://localhost:8080/zmap/src/zmap/image/marker-icon.png"})
+						url: "http://localhost:8080/zmap/src/zmap/image/icon1.jpg"})
+
+			if(!polygonLayer){
+				polygonLayer = new Z.TerrainGraphicLayer({enableTip: true, enableTitle: true, enableIcon: false});
+				map.addLayer(polygonLayer, 4);
+
+				polygonLayer.on("graphicmouseover", function(e){
+					var obj = e.objects;
+
+					if(obj && obj.length > 0){
+						obj[0].updateSymbol(mouseOverSymbol);
+					}
+				})
+
+				polygonLayer.on("graphicmouseout", function(e){
+					var obj = e.objects;
+
+					if(obj && obj.length > 0){
+						obj[0].updateSymbol(symbol);
+					}
+				})
+			}
+
+			console.info("polygonCount:" + testWktData.length);
+			var graphics = [];
+			for(var i = 0; i < testWktData.length; i++){
+				//var coords = Z.WktParser.wkt2Array(testWktData[i].SHAPE),
+				var coords = Z.WktParser.wkt2Array(testWktData[i].the_geom),
+						shapes = [];
+				if(coords.type === "MultiPolygon"){
+					shapes = coords.coords;
+				}else if(coords.type === "Polygon"){
+					shapes = [coords.coords];
+				}
+
+				var geom = new Z.Polygon(shapes);
+				var shape = new Z.Feature(testWktData[i], geom);
+
+				//var graphic = new Z.Graphic(shape, symbol, {tip: "321", title: "aaa"});
+				var graphic = new Z.Graphic(shape, symbol, {tip: "#{CODE}", title: "#{STARTTIME}", iconSymbol: markerSymbol});
+				graphics.push(graphic);
+//				polygonLayer.addGraphic(graphic);
+			}
+
+			polygonLayer.addGraphics(graphics);
+		}
+
+		var pictureLayer = null;
+		function addPictureMarker(){
+			var geom = new Z.LatLng(31.5801890000232,120.293820214832);//var geom = new Z.LatLng(32,103);
+			var shape = new Z.Feature({id:'id112', name: 'name1234'}, geom);
+			var symbol = new Z.PictureMarkerSymbol(
+					{offset: new Z.Point(12, 21, 0), width:25, height:41,
+					url: "http://localhost:8080/zmap/src/zmap/image/marker-icon.png"});
+			//var symbol = new Z.PictureMarkerSymbol("http://localhost:8080/zmap/src/zmap/image/marker-icon.png");
+			var graphic = new Z.Graphic(shape, symbol);
+
+			if(!pictureLayer){
+				pictureLayer = new Z.GraphicLayer();
+				map.addLayer(pictureLayer, 3);
+			}
+
+			pictureLayer.addGraphic(graphic);
+			map.panTo(geom);
+
+		}
+
+		var pictureLayer_c;
+		function addCircle(){
+			var geom = new Z.Circle(null, new Z.LatLng(31.5801890000232,120.294820214832), 5, 'pixel');//var geom = new Z.LatLng(32,103);   {x:120.293820214832, y:31.5801890000232}
+			var shape = new Z.Feature({id:'id112', name: 'name1234'}, geom);
+			var symbol = new Z.CircleSymbol({hideBorder: false, fillSymbol: new Z.SimpleFillSymbol({opacity: 1, color:'#00ffff'})});
+			//var symbol = new Z.PictureMarkerSymbol("http://localhost:8080/zmap/src/zmap/image/marker-icon.png");
+			var graphic = new Z.Graphic(shape, symbol, {
+				titleProp: 'name',
+				titleSymbol: new Z.TextSymbol({
+					fill: true,
+					fillSymbol:{opacity: 0.5},
+					border: true,
+					borderSymbol:{opacity: 1, width: 2, color: '#000000', opacity: 0.6}
+				})});
+
+			if(!pictureLayer_c){
+				pictureLayer_c = new Z.GraphicLayer({enableInfoWindow: true, enableTip: true});
+				map.addLayer(pictureLayer_c, 2);
+			}
+
+			pictureLayer_c.addGraphic(graphic);
+			graphic.showTitle();
+			map.panTo(new Z.LatLng(31.5801890000232,120.294820214832));
+		}
+
+		var pictureLayer_r;
+		function addRing() {
+			var geom = new Z.Ring(null, new Z.LatLng(31.5801890000232, 120.293820214832), 20, 100);//var geom = new Z.LatLng(32,103);
+			var shape = new Z.Feature({id: 'id112', name: 'name1234'}, geom);
+			var symbol = new Z.RingSymbol({fillSymbol: new Z.SimpleFillSymbol({opacity: 0.99, color:'#ffff00'})});
+			//var symbol = new Z.PictureMarkerSymbol("http://localhost:8080/zmap/src/zmap/image/marker-icon.png");
+			var graphic = new Z.Graphic(shape, symbol);
+
+			if (!pictureLayer_r) {
+				pictureLayer_r = new Z.GraphicLayer();
+//				map.addLayer(pictureLayer_r, 3);
+				map.addLayer(pictureLayer_r, 1, Z.LayerGroup.BaseOverLayer);
+			}
+
+			pictureLayer_r.addGraphic(graphic);
+			map.panTo(new Z.LatLng(31.5801890000232, 120.293820214832));
+		}
+
+		var pictureLayer_t;
+		function addTextMarker(){
+			var geom = new Z.LatLng(31.5801890000232,120.293820214832,12);//new Z.LatLng(31.5801890000232,120.293820214832,12);
+			var shape = new Z.Feature({id:'id112', name: 'name1234'}, geom);
+			var symbol = new Z.TextSymbol({text:"百脑汇科技大厦Aaygh",
+				font: {size: 20, style: Z.FontStyle.Italic, weight: Z.FontWeight.Bold}, color: '#ff0000', opacity: 0.99,
+				fill: true, fillSymbol: {color: "#eeeeee", opacity: 0.7},
+				border: false, borderSymbol: {color: '#ff0000'}});
+			var selectedSymbol = new Z.TextSymbol({text:"百脑汇科技大厦",
+				font: {size: 20, style: Z.FontStyle.Normal, weight: Z.FontWeight.Bold}, color: '#ffff00', opacity: 0.99,
+				fill: true, fillSymbol: {color: "#eeeeee", opacity: 0.7},
+				border: true, borderSymbol: {color: '#ff0000'}});
+			//var symbol = new Z.PictureMarkerSymbol("http://localhost:8080/zmap/src/zmap/image/marker-icon.png");
+			var graphic = new Z.Graphic(shape, symbol);
+
+			if(!pictureLayer_t){
+				pictureLayer_t = new Z.GraphicLayer();
+				map.addLayer(pictureLayer_t, 2, Z.LayerGroup.BaseBgLayer);
+//				map.addLayer(pictureLayer_t, 2);
+			}
+
+			pictureLayer_t.addGraphic(graphic);
+			map.panTo(geom);
+
+			var selectedGraphic;
+			pictureLayer_t.on("click", function(e){console.info("layerEvent:" + e.type);
+				if(e.objects.length > 0){
+					var curGraphic = e.objects[0];
+					if(curGraphic !== selectedGraphic){
+						curGraphic.updateSymbol(selectedSymbol);
+
+						if(selectedGraphic){
+							selectedGraphic.updateSymbol(symbol);
+						}
+
+						selectedGraphic = curGraphic;
+						map.refresh();
+					}
+				}
+			});
+		}
+
+		var graphic1,
+			pictureLayer_ext;
+		function addExtrude(){
+			var geom = new Z.Extrude(null,
+					[[[30.1,99], [30,99], [30, 99.1], [30.1, 99.1]]],
+					2000
+			);
+			var shape = new Z.Feature({id:'id112', name: 'name1234'}, geom);
+			var symbol = new Z.ExtrudeSymbol({
+				topColor:'#ff0000',
+				wallColor:'#ffff00'
+			});
+			var graphic = new Z.Graphic(shape, symbol);
+
+			if(!pictureLayer_ext){
+				pictureLayer_ext = new Z.GraphicLayer();
+				map.addLayer(pictureLayer_ext, 2);
+			}
+
+			pictureLayer_ext.addGraphic(graphic);
+//			vectorLayer.addGraphic(multiGraphic);
+			map.panTo(new Z.LatLng(30.05, 99.05), 11);
+			map.rotateByEuler({x: 70, y:0, z:0});
+		}
+	</script>
+</head>
+<body onload="load()">
+	<br><br>
+	<!--<input type="button" value="addNewObject" onclick="addNewObject()">-->
+	<input type="button" value="重置相机位置" onclick="reset()">
+	<input type="button" value="旋转x+" onclick="x_add()">
+	<input type="button" value="旋转x-" onclick="x_sub()">
+	<!--<input type="button" value="旋转y+" onclick="y_add()">-->
+	<!--<input type="button" value="旋转y-" onclick="y_sub()">-->
+	<input type="button" value="旋转z+" onclick="z_add()">
+	<input type="button" value="旋转z-" onclick="z_sub()">
+	<!--<input type="button" value="移动x+" onclick="x_pan_add()">-->
+	<!--<input type="button" value="移动x-" onclick="x_pan_sub()">-->
+	<!--<input type="button" value="移动y+" onclick="y_pan_add()">-->
+	<!--<input type="button" value="移动y-" onclick="y_pan_sub()">-->
+	<!--<input type="button" value="移动z+" onclick="z_pan_add()">-->
+	<!--<input type="button" value="移动z-" onclick="z_pan_sub()">-->
+	<!--<input type="button" value="太阳上升" onclick="sun_up()">-->
+	<!--<input type="button" value="太阳下落" onclick="sun_down()">-->
+	<input type="button" value="放大" onclick="zoomIn()">
+	<input type="button" value="缩小" onclick="zoomOut()">
+	<br>
+	<!--<input type="button" value="添加天地图矢量底图" onclick="addVectorLayer()">-->
+	<!--<input type="button" value="添加天地图矢量注记" onclick="addVectorAnnoLayer()">-->
+	<!--<input type="button" value="添加天地图影像底图" onclick="addRasterLayer()">-->
+	<!--<input type="button" value="添加天地图影像注记" onclick="addRasterAnnoLayer()">-->
+	<!--<input type="button" value="移除天地图矢量底图" onclick="removeVectorLayer()">-->
+	<!--<input type="button" value="移除天地图矢量注记" onclick="removeVectorAnnoLayer()">-->
+	<!--<input type="button" value="移除天地图影像底图" onclick="removeRasterLayer()">-->
+	<!--<input type="button" value="移除天地图影像注记" onclick="removeRasterAnnoLayer()">-->
+	<!--<br>-->
+	<input type="button" value="添加线" onclick="addPolyline()">
+	<input type="button" value="添加面" onclick="addPolygon()">
+	<input type="button" value="添加图片标注" onclick="addPictureMarker()">
+	<input type="button" value="添加文字标注" onclick="addTextMarker()">
+	<input type="button" value="添加圆形标注" onclick="addCircle()">
+	<input type="button" value="添加环形标注" onclick="addRing()">
+	<input type="button" value="添加Extrude" onclick="addExtrude()">
+	<!--<input type="button" value="显示子Extrude" onclick="showSubExtrude()">-->
+	<!--<input type="button" value="隐藏子Extrude" onclick="hideSubExtrude()">-->
+	<!--<input type="button" value="添加建筑物" onclick="loadBuildings()">-->
+	<!--<input type="button" value="popup" onclick="showPopup()">-->
+	<div id="map" style="width: 1000px; height: 500px;"></div>
+	<br><span id="aaa"></span>
+	<!--<br><span id="bbb"></span><br>-->
+
+
+</body>
+</html>

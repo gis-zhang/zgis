@@ -1,0 +1,47 @@
+﻿<html>
+<head>
+	<title>地图api测试示例</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../src/lib/leaflet-0.7.3/leaflet.css" />
+
+	<script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
+	<script src="../src/lib/leaflet-extend/control/Util.js"></script>
+	<script src="../src/lib/leaflet-extend/layer/L.CustomTileLayer.js"></script>
+	<script src="../src/lib/leaflet-extend/layer/layer.wmts-src.js"></script>
+	<script src="../src/lib/leaflet-extend/layer/layer.tdt-src.js"></script>
+	<script src="../src/lib/leaflet-plugin/Leaflet.zoomslider-0.6.1/src/L.Control.Zoomslider.js"></script>
+	<script src="../src/lib/leaflet-extend/crs/L.CRS.CustomLevel.js"></script>
+	<script src="../src/lib/leaflet-extend/control/L.Control.Layers.Custom.js"></script>
+	<script src="../src/lib/leaflet-plugin/MiniMap/Control.MiniMap.min.js"></script>
+	<script src="../src/lib/leaflet-extend/MapConfig.js" charset="GBK"></script>
+	<script src="../src/lib/leaflet-extend/Map.js"></script>
+	<script src="../dist/zmap-release.js"></script>
+	<script>
+		function load(){
+
+			var map = new ZMap('map');
+			//var layer = new Z.TileLayer();
+			var layer = new Z.TDTVectorLayer();
+			map.addLayer(layer);
+
+			var layer1 = new Z.WMTSTileLayer("http://t0.tianditu.com/cva_c/wmts", {
+				tileInfo:{
+					format:'tiles'
+				},params : {
+					layer:'cva',
+					tilematrixSet:'c'
+				}
+			});
+			map.addLayer(layer1);
+		}
+	</script>
+</head>
+<body onload="load()">
+	<div id="map" style="width: 1000px; height: 800px"></div>
+
+
+</body>
+</html>

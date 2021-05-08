@@ -1,0 +1,854 @@
+﻿<html>
+<head>
+	<title>地图api测试示例-建筑模型-3dmax</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../src/lib/leaflet-0.7.3/leaflet.css" />
+	<link rel="stylesheet" href="../dist/zmap.css" />
+
+	<script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
+	<script src="../src/lib/threejs_new/three.js"></script>
+	<script src="../src/lib/threejs/ConvexGeometry.js"></script>
+	<script src="../src/lib/threebsp/ThreeBSP.js"></script>
+	<script src="../src/lib/stats.min.js"></script>
+
+	<script src="../src/lib/threejs-ext/loaders/DDSLoader.js"></script>
+	<script src="../src/lib/threejs-ext/loaders/MTLLoader.js"></script>
+	<script src="../src/lib/threejs-ext/loaders/OBJLoader.js"></script>
+
+	<script src="../dist/zmap-release.js"></script>
+	<script src="data/indoordata_wkt1.json"></script>
+	<script src="data/rfidpath.js"></script>
+	<script>
+		var rotateX = 0, rotateY = 0; rotateZ = 0, map = null, sunH = 30, sunV = 45;
+
+		function load(){
+//			map = new ZMap('map', {sceneType: '3D', center:{x:118.9038, y:32.1181}, initZoom: 18, maxZoom: 25});   //32.1181, 118.9038, 0
+			map = new ZMap('map', {sceneType: '3D', center:{x:114.264451, y:30.582994}, initZoom: 18, maxZoom: 25});   //32.1181, 118.9038, 0
+			map.rotateByEuler({x: 70, y:0, z:0});
+			//document.onkeydown = doKeyDown;
+		}
+
+		function x_add(){
+			//rotateX += 5;
+			rotateX = 2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function x_sub(){
+//			rotateX -= 5;
+			rotateX = -2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function y_add(){
+//			rotateY += 5;
+			rotateY = 5;
+			rotateX = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function y_sub(){
+//			rotateY -= 5;
+			rotateY = -5;
+			rotateX = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function z_add(){
+			//rotateZ += 5;
+			rotateZ = 5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+		function z_sub(){
+			//rotateZ -= 5;
+			rotateZ = -5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+		function x_pan_add(){
+			map.panBy(10);
+			showBbox();
+		}
+
+		function x_pan_sub(){
+			map.panBy(-10);
+			showBbox();
+		}
+
+		function y_pan_add(){
+			//map._scene.translateByGL({x: 0, y:1, z:0});
+			map.panBy(0, 50);
+			showBbox();
+		}
+
+		function y_pan_sub(){
+			//map._scene.translateByGL({x: 0, y:-1, z:0});
+			map.panBy(0, -50);
+			showBbox();
+		}
+
+//		function z_pan_add(){
+//			//map._scene.translateByGL({x: 0, y:0, z:1});
+//			//map.panBy(0, -50);
+//			showBbox();
+//		}
+//
+//		function z_pan_sub(){
+//			//map._scene.translateByGL({x: 0, y:0, z:-1});
+//			//map.panBy(0, -50);
+//			showBbox();
+//		}
+
+//		function sun_up(){
+//			sunV += 5;
+//			map.setSunLight({h: sunH, v:sunV});
+//		}
+//
+//		function sun_down(){
+//			sunV -= 5;
+//			map.setSunLight({h: sunH, v:sunV});
+//		}
+
+		function clickMap(event){
+			var point = map.screenPointToLatLng(new Z.Point(event.clientX,event.clientY));
+			alert(point.lat + "," + point.lng);
+		}
+
+		var spriteContainer;
+		var i = 1;
+		function refreshSprite(){
+//			var mapRotate = map._scene.getRotateByRad();
+//			spriteContainer.setRotationFromQuaternion(new THREE.Quaternion(mapRotate.x, mapRotate.y, mapRotate.z, mapRotate.w));
+		}
+
+		function refresh(){
+			//map._scene.setRotationByEuler({x: rotateX, y:rotateY, z:rotateZ});
+			map.rotateByEuler({x: rotateX, y:rotateY, z:rotateZ});
+			//map._scene.render();
+
+			//refreshSprite();
+			//map._scene.refresh();
+			//showBbox();
+		}
+
+		function showBbox(){
+			var visibleBounds = map._scene._sceneRender.getVisibleGLBounds();
+			var visibleLatLngBounds = map.getContentBounds();
+			document.getElementById("aaa").innerHTML = "Left:x=" + visibleBounds.getBottomLeft().x + ";y=" + visibleBounds.getBottomLeft().y + ";z=" + visibleBounds.getBottomLeft().z +
+					"。Right:x=" + visibleBounds.getTopRight().x + ";y=" + visibleBounds.getTopRight().y + ";z=" + visibleBounds.getTopRight().z;
+			document.getElementById("bbb").innerHTML = "Left:x=" + visibleLatLngBounds.getWest() + ";y=" + visibleLatLngBounds.getSouth() + ";z=" + visibleLatLngBounds.getBottom() +
+					"。Right:x=" + visibleLatLngBounds.getEast() + ";y=" + visibleLatLngBounds.getNorth() + ";z=" + visibleLatLngBounds.getTop();
+		}
+
+		function reset(){
+			map._scene._sceneRender.resetCamera();
+			map._scene._sceneRender.render();
+		}
+
+		function zoomIn(){
+			map.zoomIn();
+		}
+
+		function zoomOut(){
+			map.zoomOut();
+		}
+
+		var added = false;
+		var layer1 = new Z.TDTVectorLayer();
+		var layer2 = new Z.TDTVectorAnnoLayer();
+		var layer3 = new Z.TDTRasterLayer();
+		var layer4 = new Z.TDTRasterAnnoLayer();
+
+		function addVectorLayer(){
+			map.addLayer(layer1, 0);
+//			map.addLayer(layer1, 0, Z.LayerGroup.BaseBgLayer);
+		}
+		function addVectorAnnoLayer(){
+			map.addLayer(layer2, 1);
+		}
+		function addRasterLayer(){
+			//map.addLayer(layer3, 0, Z.LayerGroup.BaseOverLayer);
+			map.addLayer(layer3, 2, Z.LayerGroup.BaseBgLayer);
+		}
+		function addRasterAnnoLayer(){
+			map.addLayer(layer4, 3, Z.LayerGroup.BaseBgLayer);
+			//map.addLayer(layer4, 1, Z.LayerGroup.BaseOverLayer);
+			//map.addLayer(layer2, 3, Z.LayerGroup.BaseOverLayer);
+		}
+		function removeVectorLayer(){
+			map.removeLayer(layer1);
+		}
+		function removeVectorAnnoLayer(){
+			map.removeLayer(layer2);
+		}
+		function removeRasterLayer(){
+			map.removeLayer(layer3);
+		}
+		function removeRasterAnnoLayer(){
+			map.removeLayer(layer4);
+		}
+
+		var buildingLayer;
+		function loadBuildings() {
+			var modelUrl = "data/wushangguangchang/wushangguangchang1";
+
+			if(!buildingLayer){
+				buildingLayer = new Z.ThreeDMaxModelLayer({
+					enableTip: true,
+					//enableTitle: true,
+					enableInfoWindow: true,
+					infoWindowOptions: {
+						width: 300
+					}
+				});
+				map.addLayer(buildingLayer);
+
+				buildingLayer.on("modelLoaded", function(e){
+					var floorPanel = document.getElementById("floorContainer");
+
+					if(floorPanel){
+						floorPanel.style.display = "block";
+					}
+
+					var floorIndexes = buildingLayer.getFloorIndexes();
+					createFloorsPanel(floorIndexes);
+
+					var componentTypes = buildingLayer.getComponentTypes();
+					createComponentsPanel(componentTypes);
+
+					changeFloorSelect();
+				});
+			}
+
+			var transformation = new Z.Transformation();
+			//transformation.doScale(0.00000001, 0.000000009, 0.001);
+			transformation.doScale(0.0000030, 0.0000030, 0.5);
+			transformation.doRotation(0, 0, Math.PI * 21 / 180);
+			//transformation.doRotation(0, 0, 0);
+			//transformation.doTranslation(118.7123, 32.01396, 0);
+			transformation.doTranslation(114.264451, 30.582994, 0);
+			buildingLayer.showModel(modelUrl, transformation);
+
+			//var geom = new Z.LatLng(32.01126, 118.71576, 0);
+			//var geom = new Z.LatLng(30.584284, 114.263871, 0);
+			var geom = new Z.LatLng(30.582994, 114.264451, 0);
+			map.panTo(geom);
+//			var floorIndexes = buildingLayer.getFloorIndexes();
+//			createFloorsPanel(floorIndexes);
+//
+//			var componentTypes = buildingLayer.getComponentTypes();
+//			createComponentsPanel(componentTypes);
+		}
+
+		function createFloorsPanel(floorIndexes){
+			var containerElement = document.getElementById("floorMenu");
+			containerElement.innerHTML = "";
+			var isFirst = true;
+
+			//for(var key in floorIndexes){
+			for(var i = 0; i < floorIndexes.length; i++){
+				var key = floorIndexes[i];
+				var element = createCheckBox(containerElement, "floorGroup", key);
+				element.floorIndex = key;
+				element.onclick = function(){
+					changeFloorSelect();
+				};
+
+				if(isFirst){
+					element.checked = true;
+					element.onclick();
+					isFirst = false;
+				}
+			}
+		}
+
+		function createComponentsPanel(componentTypes){
+			var elementContainerElement = document.getElementById("elementContainer");
+			elementContainerElement.innerHTML = "";
+
+			for(var k in componentTypes){
+				var elementNode = createCheckBox(elementContainerElement, "elementGroup", componentTypes[k] || k);
+				elementNode.elementType = componentTypes[k];
+				elementNode.onclick = function(){
+					changeFloorSelect();
+				};
+
+//				if(k.indexOf("Element") >= 0){
+//					elementNode.checked = true;
+//				}
+			}
+		}
+
+		function createCheckBox(containerNode, name, text){
+			var element = document.createElement("input");
+			element.type="checkbox";
+			element.name=name;
+			containerNode.appendChild(element);
+			containerNode.appendChild(document.createTextNode(text));
+			containerNode.appendChild(document.createElement("br"));
+
+			return element;
+		}
+
+		function changeFloorSelect(){
+			var checkBoxes = document.getElementsByName("floorGroup"),
+					floorIndexes = [];
+
+			for(var i = 0; i < checkBoxes.length; i++){
+				if(checkBoxes[i].checked){
+					floorIndexes.push(checkBoxes[i].floorIndex);
+				}
+			}
+
+			var elementCheckBoxes = document.getElementsByName("elementGroup"),
+					elementTypes = [];
+
+			for(var j = 0; j < elementCheckBoxes.length; j++){
+				if(elementCheckBoxes[j].checked){
+					//elementTypes[elementCheckBoxes[j].elementType] = "1";
+					elementTypes.push(elementCheckBoxes[j].elementType);
+				}
+			}
+
+			buildingLayer.showFloors(floorIndexes, elementTypes);
+		}
+
+//		var RFIDLayer, rfid1, rfid2, rfid3;
+//
+//		function showRFID1() {
+//			if(!rfid1){
+//				var geom1 = new Z.Sphere(null, new Z.LatLng(32.1173, 118.9038, 3.8 * 0 + 1.5), 0.5);
+//				rfid1 = new Z.Graphic(
+//						new Z.Feature({name: "标签1"}, geom1),
+//						new Z.SimpleFillSymbol({color: "#ff0000", opacity: 1}),
+//						{title: "#{name}", enableTitle: true}
+//				);
+//			}
+//
+//			showRFIDGraphic(rfid1);
+//		}
+//
+//		function hideRFID1() {
+//			hideRFIDGraphic(rfid1);
+//		}
+//
+//		function showRFID2() {
+//			if(!rfid2){
+//				var geom2 = new Z.Sphere(null, new Z.LatLng(32.1173, 118.9038, 3.8 * 1 + 1.5), 0.5);
+//				rfid2 = new Z.Graphic(
+//						new Z.Feature({name: "标签2"}, geom2),
+//						new Z.SimpleFillSymbol({color: "#ff0000", opacity: 1}),
+//						{title: "#{name}", enableTitle: true}
+//				);
+//			}
+//
+//			showRFIDGraphic(rfid2);
+//		}
+//
+//		function hideRFID2() {
+//			hideRFIDGraphic(rfid2);
+//		}
+//
+//		function showRFID3() {
+//			if(!rfid3){
+//				var geom3 = new Z.Sphere(null, new Z.LatLng(32.1173, 118.9038, 3.8 * 2 + 1.5), 0.5);
+//				rfid3 = new Z.Graphic(
+//						new Z.Feature({name: "标签3"}, geom3),
+//						new Z.SimpleFillSymbol({color: "#ff0000", opacity: 1}),
+//						{title: "#{name}", enableTitle: true}
+//				);
+//			}
+//
+//			showRFIDGraphic(rfid3);
+//		}
+//
+//		function hideRFID3() {
+//			hideRFIDGraphic(rfid3);
+//		}
+//
+//		function showRFIDGraphic(graphic) {
+//			if (!RFIDLayer) {
+//				RFIDLayer = new Z.GraphicLayer({
+//					//enableTip: true,
+//					nameProp: "name",
+//					enableTitle: true
+//				});
+//				map.addLayer(RFIDLayer);
+//			}
+//
+//			if(!RFIDLayer.hasGraphic(graphic)){
+//				RFIDLayer.addGraphic(graphic);
+//			}else{
+//				graphic.show();
+//			}
+//		}
+//
+//		function hideRFIDGraphic(graphic) {
+//			if (RFIDLayer && graphic && RFIDLayer.hasGraphic(graphic)) {
+//				graphic.hide();
+//			}
+//		}
+//
+//		var rfidStep = 0.5,
+//				selectedRFID,
+//				latLngOffset;
+//
+//		function getSelectedRFID(){
+//			if(!selectedRFID){
+//				selectedRFID = rfid1;
+//			}
+//
+//			return selectedRFID;
+//		}
+//
+//		function getLatLngOffset(crs, xStep, yStep){
+//			if(!latLngOffset){
+//				latLngOffset = crs.unprojectLatLngOffset(new Z.Point(1, 1, 0));
+//			}
+//
+//			return new Z.LatLng(yStep * latLngOffset.lat, xStep * latLngOffset.lng);
+//		}
+//
+//		function offsetRfid(rfid, xOffset, yOffset){
+//			if(!rfid){
+//				return;
+//			}
+//
+//			var feature = rfid.feature,
+//					shape = feature.shape,
+//					center = shape.center,
+//					crs = shape.crs;
+//			var latLngOffset = getLatLngOffset(crs, xOffset, yOffset);
+//			center.lat += latLngOffset.lat;
+//			center.lng += latLngOffset.lng;
+//			rfid.updateFeature(feature);
+//		}
+//
+//		function rfidUp(){
+//			offsetRfid(getSelectedRFID(), 0, rfidStep);
+//		}
+//
+//		function rfidDown(){
+//			offsetRfid(getSelectedRFID(), 0, -rfidStep);
+//		}
+//
+//		function rfidLeft(){
+//			offsetRfid(getSelectedRFID(), -rfidStep, 0);
+//		}
+//
+//		function rfidRight(){
+//			offsetRfid(getSelectedRFID(), rfidStep, 0);
+//		}
+//
+//		function doKeyDown(evt){
+//			evt = (evt) ? evt : window.event;
+//			var keyCode = evt.charCode || evt.keyCode;
+//
+//			if(keyCode === 37){
+//				rfidLeft();
+//			}else if(keyCode === 38){
+//				rfidUp();
+//			}else if(keyCode === 39){
+//				rfidRight();
+//			}else if(keyCode === 40){
+//				rfidDown();
+//			}
+//		}
+//
+//		var pathLayer, pathGraphic;
+//
+//		function getPathLayer(){
+//			if(!pathLayer){
+//				pathLayer = new Z.GraphicLayer({
+//					//enableTip: true,
+//					//nameProp: "name",
+//					//enableTitle: true
+//				});
+//				map.addLayer(pathLayer);
+//			}
+//
+//			return pathLayer;
+//		}
+//
+//		function showPath(){
+//			if(rfidPath && !pathGraphic){
+//				var pathGeomery = new Z.Polyline([rfidPath]);
+//				pathGraphic = new Z.Graphic(
+//						new Z.Feature({}, pathGeomery),
+//						new Z.PolylineSymbol({only2d: false, color: "#ffff00", width: 5, style: Z.PolylineStyleType.Dash, dashSize: 20, gapSize: 10})
+//				);
+//
+//				var layer = getPathLayer();
+//				layer.addGraphic(pathGraphic);
+//			}
+//
+//			pathGraphic.show();
+//		}
+//
+//		function hidePath(){
+//			if(pathGraphic){
+//				pathGraphic.hide();
+//			}
+//		}
+//
+//		function moveByPath(){
+//			if(!rfidPath){
+//				return;
+//			}
+//
+//
+////			for(var i = 0; i < rfidPath.length; i++){
+////				curPoints.push(rfidPath[i]);
+////			}
+//
+//			if(pointLoop >= rfidPath.length){
+//				pointLoop = 0;
+//				lastLoop = -1;
+//				curPos = null;
+//				curPoints = [];
+//			}
+//
+//			requestAnimationFrame(doMove);
+//		}
+//
+//		var curPos = null, curPoints = [], pointLoop = 0, lastLoop = -1, realPathGraphic, realRFIDGraphic, interval = 4, curIntervalLoop = 0;
+//		function doMove(){
+//			if(pointLoop >= rfidPath.length){
+//				return;
+//			}
+//
+//			if(curIntervalLoop === interval){
+//				curPos = rfidPath[pointLoop];
+//
+//				//定位刷新
+//				showRealRFIDGraphic(curPos);
+//
+//				for(var j = lastLoop + 1; j <= pointLoop; j++){
+//					curPoints.push(rfidPath[j]);
+//				}
+//
+//				showRealPath(curPoints);
+//
+//				lastLoop = pointLoop;
+//				pointLoop++;
+//				curIntervalLoop = 0;
+//
+//				//beInFence();
+//			}else{
+//				curIntervalLoop++;
+//			}
+//
+//			requestAnimationFrame(doMove);
+//		}
+//
+//		function showRealRFIDGraphic(point) {
+//			if(!rfid1){
+//				showRFID1();
+//			}
+//
+//			var shape = rfid1.feature.shape;
+//			shape.center = new Z.LatLng(point[0], point[1], point[2]);
+//			rfid1.updateFeature(rfid1.feature);
+//		}
+//
+//		function showRealPath(points){
+//			if(points.length > 0){
+//				if(!realPathGraphic){
+//					var pathGeomery = new Z.Polyline([points]);
+//					realPathGraphic = new Z.Graphic(
+//							new Z.Feature({}, pathGeomery),
+//							new Z.PolylineSymbol({only2d: false, color: "#ff0000", width: 10, style: Z.PolylineStyleType.Dash, dashSize: 20, gapSize: 10})
+//					);
+//
+//					if(!pathLayer){
+//						pathLayer = new Z.GraphicLayer({
+//							//enableTip: true,
+//							//nameProp: "name",
+//							//enableTitle: true
+//						});
+//						map.addLayer(pathLayer);
+//					}
+//
+//					pathLayer.addGraphic(realPathGraphic);
+//				}else{
+//					realPathGraphic.feature.shape.paths = [points];
+//					realPathGraphic.updateFeature(realPathGraphic.feature);
+//				}
+//			}
+//
+//			realPathGraphic.show();
+//		}
+//
+//		var fenceGraphic1;
+//		function showFence1(){
+//			if(!fenceGraphic1){
+//				var southWest = new Z.LatLng(32.11733520823986, 118.9039411457613, 0.800000037997961),
+//						northEast = new Z.LatLng(32.1174144262386, 118.90401916576081, 4.600000218488276);
+//				var height = (northEast.alt - southWest.alt) || 0,
+//						baseHeight = southWest.alt || 0,
+//						paths = [[[southWest.lat, southWest.lng], [southWest.lat, northEast.lng], [northEast.lat, northEast.lng], [northEast.lat, southWest.lng]]];
+//				var extrude = new Z.Extrude(null, paths, height, baseHeight),
+//						extrudeSymbol = new Z.ExtrudeSymbol({topColor: "#00ffff", wallColor: "#00ffff", opacity: 0.3});
+//				fenceGraphic1 = new Z.Graphic(new Z.Feature({}, extrude), extrudeSymbol);
+//
+//				var layer = getPathLayer();
+//				layer.addGraphic(fenceGraphic1);
+//				checkFence1 = true;
+//				checkFence();
+//			}
+//
+//			fenceGraphic1.show();
+//		}
+//
+//		var fenceGraphic2;
+//		function showFence2(){
+//			if(!fenceGraphic2){
+//				var center = new Z.LatLng(32.11713830324891, 118.9040335619738, 0.800000037997961),   //32.11713830324891,118.9040335619738
+//						radius = 2,
+//						height = 3;
+//				var circle = new Z.Circle(null, center, radius);
+//				var extrude = new Z.CircleExtrude(circle, height),
+//						extrudeSymbol = new Z.ExtrudeSymbol({topColor: "#00ffff", wallColor: "#00ffff", opacity: 0.3});
+//				fenceGraphic2 = new Z.Graphic(new Z.Feature({}, extrude), extrudeSymbol);
+//
+//				var layer = getPathLayer();
+//				layer.addGraphic(fenceGraphic2);
+//				checkFence2 = true;
+//				checkFence();
+//			}
+//
+//			fenceGraphic2.show();
+//		}
+//
+//		var alertColor = ["#ff0000", "#ffffff"], colorIndex = 0;
+//
+//		function beInFence(){
+//			var inFence = false,
+//					text = "";
+//
+//			if(checkFence1){
+//				if(beInFence1()){
+//					text = "标签1进入电子围栏1"
+//					inFence = true;
+//				}
+//			}
+//
+//			if(checkFence2){
+//				if(beInFence2()){
+//					text = "标签1进入电子围栏2"
+//					inFence = true;
+//				}
+//			}
+//
+//			if(inFence){
+//				showAlert(alertColor[colorIndex ++ %2], text);
+//			}else{
+//				hideAlert();
+//			}
+//		}
+//
+//		function beInFence1(){
+//			var curRfid = getSelectedRFID();
+//
+//			if(!curRfid){
+//				return;
+//			}
+//
+//			var realPos = curRfid.feature.shape.center,
+//					minLat = 32.11733520823986,
+//					minLng = 118.9039411457613,
+//					maxLat = 32.1174144262386,
+//					maxLng = 118.90401916576081,
+//					minHeight = 0.800000037997961,
+//					maxHeight = 4.600000218488276;
+//
+//			if(realPos.lat >= minLat && realPos.lat <= maxLat
+//					&& realPos.lng >= minLng && realPos.lng <= maxLng
+//					&& realPos.alt >= minHeight && realPos.alt <= maxHeight){
+//				//showAlert(alertColor[colorIndex ++ %2], "标签1进入电子围栏1");
+//				return true;
+//			}else{
+//				//hideAlert();
+//				return false;
+//			}
+//		}
+//
+//		function beInFence2(){
+//			var curRfid = getSelectedRFID();
+//
+//			if(!curRfid){
+//				return;
+//			}
+//
+//			var realPos = curRfid.feature.shape.center,
+//					fenceCenter = fenceGraphic2.feature.shape.circle.center,
+//					fenceRadius = fenceGraphic2.feature.shape.circle.radius,
+//					minHeight = fenceGraphic2.feature.shape.baseHeight,
+//					maxHeight = minHeight + fenceGraphic2.feature.shape.height,
+//					crs = fenceGraphic2.feature.shape.crs;
+//
+//			if(realPos.alt >= minHeight && realPos.alt <= maxHeight){
+//				var latDistance = realPos.lat - fenceCenter.lat,
+//						lngDistance = realPos.lng - fenceCenter.lng,
+//						meterDistance = crs.projectLatLngOffset(new Z.LatLng(latDistance, lngDistance)),
+//						xDistance = meterDistance.x,
+//						yDistance = meterDistance.y;
+//				var distance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+//
+//				if(distance <= fenceRadius){
+//					//showAlert(alertColor[colorIndex ++ %2], "标签1进入电子围栏2");
+//					return true;
+//				}else{
+////					hideAlert();
+//					return false;
+//				}
+//			}else{
+//				//hideAlert();
+//				return false;
+//			}
+//		}
+//
+//		function showAlert(color, text){
+//			var mapContainer = document.getElementById("map");
+//			var width = mapContainer.offsetWidth,
+//					height = mapContainer.offsetHeight,
+//					top = mapContainer.offsetTop,
+//					left = mapContainer.offsetLeft;
+//			var alertContainer = document.getElementById("alertTag"),
+//					alertWidth = alertContainer.offsetWidth,
+//					alertHeight = alertContainer.offsetHeight;
+//			alertContainer.style.display = "block";
+//			alertContainer.style.left = (left + width / 2 - alertWidth / 2) + "px";
+//			//alertContainer.style.top = (top + height / 2 - alertHeight / 2) + "px";
+//			alertContainer.style.top = (top + 5) + "px";
+//			alertContainer.style.backgroundColor = color;
+//			document.getElementById("alertStatus").innerHTML = text;
+//		}
+//
+//		function hideAlert(){
+//			document.getElementById("alertTag").style.display = "none";
+//		}
+//
+//		function checkFence(){
+//			end = 0;
+//			requestAnimationFrame(doFenceCheck);
+//		}
+//
+//		function cancilFenceChecking(){
+//			end = 1;
+//		}
+//
+//		var fenceCheckInterval = 3, intervalLoop = 0, end = 0, checkFence1 = false, checkFence2 = false;
+//		function doFenceCheck(){
+//			if(end){
+//				return;
+//			}
+//
+//			if(intervalLoop >= fenceCheckInterval){
+//				beInFence();
+//
+//				intervalLoop = 0;
+//			}else{
+//				intervalLoop++;
+//			}
+//
+//			requestAnimationFrame(doFenceCheck);
+//		}
+//
+//		var points = [];
+//		function savePoint(){
+//			var object = getSelectedRFID(),
+//					feature = object.feature,
+//					shape = feature.shape,
+//					center = shape.center;
+//
+//			points.push([center.lat, center.lng, center.alt]);
+//		}
+	</script>
+</head>
+<body onload="load()">
+	<!--<input type="button" value="addNewObject" onclick="addNewObject()">-->
+	<input type="button" value="重置相机位置" onclick="reset()">
+	<input type="button" value="旋转x+" onclick="x_add()">
+	<input type="button" value="旋转x-" onclick="x_sub()">
+	<!--<input type="button" value="旋转y+" onclick="y_add()">-->
+	<!--<input type="button" value="旋转y-" onclick="y_sub()">-->
+	<input type="button" value="旋转z+" onclick="z_add()">
+	<input type="button" value="旋转z-" onclick="z_sub()">
+	<!--<input type="button" value="移动x+" onclick="x_pan_add()">-->
+	<!--<input type="button" value="移动x-" onclick="x_pan_sub()">-->
+	<!--<input type="button" value="移动y+" onclick="y_pan_add()">-->
+	<!--<input type="button" value="移动y-" onclick="y_pan_sub()">-->
+	<!--<input type="button" value="移动z+" onclick="z_pan_add()">-->
+	<!--<input type="button" value="移动z-" onclick="z_pan_sub()">-->
+	<!--<input type="button" value="太阳上升" onclick="sun_up()">-->
+	<!--<input type="button" value="太阳下落" onclick="sun_down()">-->
+	<input type="button" value="放大" onclick="zoomIn()">
+	<input type="button" value="缩小" onclick="zoomOut()">
+	<br>
+	<input type="button" value="添加天地图矢量底图" onclick="addVectorLayer()">
+	<input type="button" value="添加天地图矢量注记" onclick="addVectorAnnoLayer()">
+	<input type="button" value="添加天地图影像底图" onclick="addRasterLayer()">
+	<input type="button" value="添加天地图影像注记" onclick="addRasterAnnoLayer()">
+	<input type="button" value="移除天地图矢量底图" onclick="removeVectorLayer()">
+	<input type="button" value="移除天地图矢量注记" onclick="removeVectorAnnoLayer()">
+	<input type="button" value="移除天地图影像底图" onclick="removeRasterLayer()">
+	<input type="button" value="移除天地图影像注记" onclick="removeRasterAnnoLayer()">
+	<br>
+	<input type="button" value="添加建筑模型" onclick="loadBuildings()">
+	<!--<input type="button" value="显示标签1" onclick="showRFID1()">-->
+	<!--<input type="button" value="隐藏标签1" onclick="hideRFID1()">-->
+	<!--<input type="button" value="显示标签2" onclick="showRFID2()">-->
+	<!--<input type="button" value="隐藏标签2" onclick="hideRFID2()">-->
+	<!--<input type="button" value="显示标签3" onclick="showRFID3()">-->
+	<!--<input type="button" value="隐藏标签3" onclick="hideRFID3()">-->
+	<!--<input type="button" value="标签前移" onclick="rfidUp()">-->
+	<!--<input type="button" value="标签后移" onclick="rfidDown()">-->
+	<!--<input type="button" value="标签左移" onclick="rfidLeft()">-->
+	<!--<input type="button" value="标签右移" onclick="rfidRight()">-->
+	<!--<input type="button" value="显示轨迹" onclick="showPath()">-->
+	<!--<input type="button" value="隐藏轨迹" onclick="hidePath()">-->
+	<!--<input type="button" value="轨迹回放" onclick="moveByPath()">-->
+	<!--<input type="button" value="显示围栏1" onclick="showFence1()">-->
+	<!--<input type="button" value="显示围栏2" onclick="showFence2()">-->
+	<!--<input type="button" value="采集定位点" onclick="savePoint()">-->
+	<br>
+	<div id="map" style="width: 1000px; height: 500px;z-index:1"></div>
+	<div id="mapTileContent"></div>
+	<br><span id="aaa"></span>
+	<!--<br><span id="bbb"></span><br>-->
+
+	<div id="floorContainer" style="position: absolute; top: 100px; right: 10px; width: 180px; height: 600px; padding: 5px;
+	display: none; opacity: 0.6; background-color: brown; border-width: thin; border-color: #000000; border-style: solid;z-index:2">
+		<p>选择楼层:</p>
+		<ul id="floorMenu"></ul>
+		<br>
+		<p>选择待查看建筑构件:</p>
+		<div id="elementContainer"></div>
+	</div>
+
+	<div id="loadingTag" style="position: absolute; top: 300px; left: 300px; width: 250px; height: 20px; padding: 5px;
+	display: none; opacity: 0.6; background-color: #aaaaaa; border-width: thin; border-color: #ffffff; border-style: solid;z-index:100">
+		<span id="loadingStatus"></span>
+	</div>
+
+	<div id="alertTag" style="position: absolute; top: 300px; left: 300px; width: 250px; height: 20px; padding: 15px;
+	display: none; opacity: 0.6; background-color: #aaaaaa; border-width: thin; border-color: #000000; border-style: solid; z-index:101">
+		<span id="alertStatus"></span>
+	</div>
+</body>
+</html>

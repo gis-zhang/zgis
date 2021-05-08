@@ -1,0 +1,406 @@
+﻿<html>
+<head>
+	<title>地图api测试示例-建筑模型-3dmax</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../src/lib/leaflet-0.7.3/leaflet.css" />
+	<link rel="stylesheet" href="../dist/zmap.css" />
+
+	<script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
+	<script src="../src/lib/threejs_new/three.js"></script>
+	<script src="../src/lib/threejs/ConvexGeometry.js"></script>
+	<script src="../src/lib/threebsp/ThreeBSP.js"></script>
+	<script src="../src/lib/stats.min.js"></script>
+
+	<script src="../src/lib/threejs-ext/loaders/DDSLoader.js"></script>
+	<script src="../src/lib/threejs-ext/loaders/MTLLoader.js"></script>
+	<script src="../src/lib/threejs-ext/loaders/OBJLoader.js"></script>
+
+	<script src="../dist/zmap-release.js"></script>
+	<script src="data/indoordata_wkt1.json"></script>
+	<script src="data/rfidpath.js"></script>
+	<script>
+		var rotateX = 0, rotateY = 0; rotateZ = 0, map = null, sunH = 30, sunV = 45;
+
+		function load(){
+//			map = new ZMap('map', {sceneType: '3D', center:{x:118.9038, y:32.1181}, initZoom: 18, maxZoom: 25});   //32.1181, 118.9038, 0
+			map = new ZMap('map', {sceneType: '3D', center:{x:114.264451, y:30.582994}, initZoom: 18, maxZoom: 25});   //32.1181, 118.9038, 0
+			map.rotateByEuler({x: 70, y:0, z:0});
+			//document.onkeydown = doKeyDown;
+		}
+
+		function x_add(){
+			//rotateX += 5;
+			rotateX = 2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function x_sub(){
+//			rotateX -= 5;
+			rotateX = -2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function y_add(){
+//			rotateY += 5;
+			rotateY = 5;
+			rotateX = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function y_sub(){
+//			rotateY -= 5;
+			rotateY = -5;
+			rotateX = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function z_add(){
+			//rotateZ += 5;
+			rotateZ = 5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+		function z_sub(){
+			//rotateZ -= 5;
+			rotateZ = -5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+		function x_pan_add(){
+			map.panBy(10);
+			showBbox();
+		}
+
+		function x_pan_sub(){
+			map.panBy(-10);
+			showBbox();
+		}
+
+		function y_pan_add(){
+			//map._scene.translateByGL({x: 0, y:1, z:0});
+			map.panBy(0, 50);
+			showBbox();
+		}
+
+		function y_pan_sub(){
+			//map._scene.translateByGL({x: 0, y:-1, z:0});
+			map.panBy(0, -50);
+			showBbox();
+		}
+
+//		function z_pan_add(){
+//			//map._scene.translateByGL({x: 0, y:0, z:1});
+//			//map.panBy(0, -50);
+//			showBbox();
+//		}
+//
+//		function z_pan_sub(){
+//			//map._scene.translateByGL({x: 0, y:0, z:-1});
+//			//map.panBy(0, -50);
+//			showBbox();
+//		}
+
+//		function sun_up(){
+//			sunV += 5;
+//			map.setSunLight({h: sunH, v:sunV});
+//		}
+//
+//		function sun_down(){
+//			sunV -= 5;
+//			map.setSunLight({h: sunH, v:sunV});
+//		}
+
+		function clickMap(event){
+			var point = map.screenPointToLatLng(new Z.Point(event.clientX,event.clientY));
+			alert(point.lat + "," + point.lng);
+		}
+
+		var spriteContainer;
+		var i = 1;
+		function refreshSprite(){
+//			var mapRotate = map._scene.getRotateByRad();
+//			spriteContainer.setRotationFromQuaternion(new THREE.Quaternion(mapRotate.x, mapRotate.y, mapRotate.z, mapRotate.w));
+		}
+
+		function refresh(){
+			//map._scene.setRotationByEuler({x: rotateX, y:rotateY, z:rotateZ});
+			map.rotateByEuler({x: rotateX, y:rotateY, z:rotateZ});
+			//map._scene.render();
+
+			//refreshSprite();
+			//map._scene.refresh();
+			//showBbox();
+		}
+
+		function showBbox(){
+			var visibleBounds = map._scene._sceneRender.getVisibleGLBounds();
+			var visibleLatLngBounds = map.getContentBounds();
+			document.getElementById("aaa").innerHTML = "Left:x=" + visibleBounds.getBottomLeft().x + ";y=" + visibleBounds.getBottomLeft().y + ";z=" + visibleBounds.getBottomLeft().z +
+					"。Right:x=" + visibleBounds.getTopRight().x + ";y=" + visibleBounds.getTopRight().y + ";z=" + visibleBounds.getTopRight().z;
+			document.getElementById("bbb").innerHTML = "Left:x=" + visibleLatLngBounds.getWest() + ";y=" + visibleLatLngBounds.getSouth() + ";z=" + visibleLatLngBounds.getBottom() +
+					"。Right:x=" + visibleLatLngBounds.getEast() + ";y=" + visibleLatLngBounds.getNorth() + ";z=" + visibleLatLngBounds.getTop();
+		}
+
+		function reset(){
+			map._scene._sceneRender.resetCamera();
+			map._scene._sceneRender.render();
+		}
+
+		function zoomIn(){
+			map.zoomIn();
+		}
+
+		function zoomOut(){
+			map.zoomOut();
+		}
+
+		var added = false;
+		var layer1 = new Z.TDTVectorLayer();
+		var layer2 = new Z.TDTVectorAnnoLayer();
+		var layer3 = new Z.TDTRasterLayer();
+		var layer4 = new Z.TDTRasterAnnoLayer();
+
+		function addVectorLayer(){
+			map.addLayer(layer1, 0);
+//			map.addLayer(layer1, 0, Z.LayerGroup.BaseBgLayer);
+		}
+		function addVectorAnnoLayer(){
+			map.addLayer(layer2, 1);
+		}
+		function addRasterLayer(){
+			//map.addLayer(layer3, 0, Z.LayerGroup.BaseOverLayer);
+			map.addLayer(layer3, 2, Z.LayerGroup.BaseBgLayer);
+		}
+		function addRasterAnnoLayer(){
+			map.addLayer(layer4, 3, Z.LayerGroup.BaseBgLayer);
+			//map.addLayer(layer4, 1, Z.LayerGroup.BaseOverLayer);
+			//map.addLayer(layer2, 3, Z.LayerGroup.BaseOverLayer);
+		}
+		function removeVectorLayer(){
+			map.removeLayer(layer1);
+		}
+		function removeVectorAnnoLayer(){
+			map.removeLayer(layer2);
+		}
+		function removeRasterLayer(){
+			map.removeLayer(layer3);
+		}
+		function removeRasterAnnoLayer(){
+			map.removeLayer(layer4);
+		}
+
+		var buildingLayer;
+		function loadBuildings() {
+			//var modelUrl = "data/cdc_outdoor/cdcoutdoor1";
+			var modelUrl = "data/cdc_outdoor_merge/outdoor";
+
+			if(!buildingLayer){
+				buildingLayer = new Z.ThreeDMaxModelLayer({
+					enableTip: true,
+					//enableTitle: true,
+					enableInfoWindow: true,
+					infoWindowOptions: {
+						width: 300
+					}
+				});
+				map.addLayer(buildingLayer);
+
+				buildingLayer.on("modelLoaded", function(e){
+					var floorPanel = document.getElementById("floorContainer");
+
+					if(floorPanel){
+						floorPanel.style.display = "block";
+					}
+
+//					var floorIndexes = buildingLayer.getFloorIndexes();
+//					createFloorsPanel(floorIndexes);
+
+					var componentTypes = buildingLayer.getComponentTypes();
+					createComponentsPanel(componentTypes);
+
+					changeFloorSelect();
+				});
+			}
+
+			var transformation = new Z.Transformation();
+			//transformation.doScale(0.00000001, 0.000000009, 0.001);
+			transformation.doScale(0.0000030, 0.0000030, 0.5);
+			transformation.doRotation(0, 0, Math.PI * 21 / 180);
+			//transformation.doRotation(0, 0, 0);
+			//transformation.doTranslation(118.7123, 32.01396, 0);
+			transformation.doTranslation(114.264451, 30.582994, 0);
+			buildingLayer.showModel(modelUrl, transformation);
+
+			//var geom = new Z.LatLng(32.01126, 118.71576, 0);
+			//var geom = new Z.LatLng(30.584284, 114.263871, 0);
+			var geom = new Z.LatLng(30.582994, 114.264451, 0);
+			map.panTo(geom);
+//			var floorIndexes = buildingLayer.getFloorIndexes();
+//			createFloorsPanel(floorIndexes);
+//
+//			var componentTypes = buildingLayer.getComponentTypes();
+//			createComponentsPanel(componentTypes);
+		}
+
+		function createFloorsPanel(floorIndexes){
+			var containerElement = document.getElementById("floorMenu");
+			containerElement.innerHTML = "";
+			var isFirst = true;
+
+			//for(var key in floorIndexes){
+			for(var i = 0; i < floorIndexes.length; i++){
+				var key = floorIndexes[i];
+				var element = createCheckBox(containerElement, "floorGroup", key);
+				element.floorIndex = key;
+				element.onclick = function(){
+					changeFloorSelect();
+				};
+
+//				if(isFirst){
+//					element.checked = true;
+//					element.onclick();
+//					isFirst = false;
+//				}
+			}
+		}
+
+		function createComponentsPanel(componentTypes){
+			var elementContainerElement = document.getElementById("elementContainer");
+			elementContainerElement.innerHTML = "";
+
+			for(var k in componentTypes){
+				var elementNode = createCheckBox(elementContainerElement, "elementGroup", componentTypes[k] || k);
+				elementNode.checked = true;
+				elementNode.elementType = componentTypes[k];
+				elementNode.onclick = function(){
+					changeFloorSelect();
+				};
+
+//				if(k.indexOf("Element") >= 0){
+//					elementNode.checked = true;
+//				}
+			}
+		}
+
+		function createCheckBox(containerNode, name, text){
+			var element = document.createElement("input");
+			element.type="checkbox";
+			element.name=name;
+			containerNode.appendChild(element);
+			containerNode.appendChild(document.createTextNode(text));
+			containerNode.appendChild(document.createElement("br"));
+
+			return element;
+		}
+
+		function changeFloorSelect(){
+//			var checkBoxes = document.getElementsByName("floorGroup"),
+//					floorIndexes = [];
+//
+//			for(var i = 0; i < checkBoxes.length; i++){
+//				if(checkBoxes[i].checked){
+//					floorIndexes.push(checkBoxes[i].floorIndex);
+//				}
+//			}
+
+			var elementCheckBoxes = document.getElementsByName("elementGroup"),
+					elementTypes = [];
+
+			for(var j = 0; j < elementCheckBoxes.length; j++){
+				if(elementCheckBoxes[j].checked){
+					//elementTypes[elementCheckBoxes[j].elementType] = "1";
+					elementTypes.push(elementCheckBoxes[j].elementType);
+				}
+			}
+
+			//buildingLayer.showFloors(floorIndexes, elementTypes);
+			buildingLayer.showComponents(elementTypes);
+		}
+	</script>
+</head>
+<body onload="load()">
+	<!--<input type="button" value="addNewObject" onclick="addNewObject()">-->
+	<input type="button" value="重置相机位置" onclick="reset()">
+	<input type="button" value="旋转x+" onclick="x_add()">
+	<input type="button" value="旋转x-" onclick="x_sub()">
+	<!--<input type="button" value="旋转y+" onclick="y_add()">-->
+	<!--<input type="button" value="旋转y-" onclick="y_sub()">-->
+	<input type="button" value="旋转z+" onclick="z_add()">
+	<input type="button" value="旋转z-" onclick="z_sub()">
+	<!--<input type="button" value="移动x+" onclick="x_pan_add()">-->
+	<!--<input type="button" value="移动x-" onclick="x_pan_sub()">-->
+	<!--<input type="button" value="移动y+" onclick="y_pan_add()">-->
+	<!--<input type="button" value="移动y-" onclick="y_pan_sub()">-->
+	<!--<input type="button" value="移动z+" onclick="z_pan_add()">-->
+	<!--<input type="button" value="移动z-" onclick="z_pan_sub()">-->
+	<!--<input type="button" value="太阳上升" onclick="sun_up()">-->
+	<!--<input type="button" value="太阳下落" onclick="sun_down()">-->
+	<input type="button" value="放大" onclick="zoomIn()">
+	<input type="button" value="缩小" onclick="zoomOut()">
+	<br>
+	<input type="button" value="添加天地图矢量底图" onclick="addVectorLayer()">
+	<input type="button" value="添加天地图矢量注记" onclick="addVectorAnnoLayer()">
+	<input type="button" value="添加天地图影像底图" onclick="addRasterLayer()">
+	<input type="button" value="添加天地图影像注记" onclick="addRasterAnnoLayer()">
+	<input type="button" value="移除天地图矢量底图" onclick="removeVectorLayer()">
+	<input type="button" value="移除天地图矢量注记" onclick="removeVectorAnnoLayer()">
+	<input type="button" value="移除天地图影像底图" onclick="removeRasterLayer()">
+	<input type="button" value="移除天地图影像注记" onclick="removeRasterAnnoLayer()">
+	<br>
+	<input type="button" value="添加建筑模型" onclick="loadBuildings()">
+	<span id="customBtn"></span>
+	<!--<input type="button" value="显示标签1" onclick="showRFID1()">-->
+	<!--<input type="button" value="隐藏标签1" onclick="hideRFID1()">-->
+	<!--<input type="button" value="显示标签2" onclick="showRFID2()">-->
+	<!--<input type="button" value="隐藏标签2" onclick="hideRFID2()">-->
+	<!--<input type="button" value="显示标签3" onclick="showRFID3()">-->
+	<!--<input type="button" value="隐藏标签3" onclick="hideRFID3()">-->
+	<!--<input type="button" value="标签前移" onclick="rfidUp()">-->
+	<!--<input type="button" value="标签后移" onclick="rfidDown()">-->
+	<!--<input type="button" value="标签左移" onclick="rfidLeft()">-->
+	<!--<input type="button" value="标签右移" onclick="rfidRight()">-->
+	<!--<input type="button" value="显示轨迹" onclick="showPath()">-->
+	<!--<input type="button" value="隐藏轨迹" onclick="hidePath()">-->
+	<!--<input type="button" value="轨迹回放" onclick="moveByPath()">-->
+	<!--<input type="button" value="显示围栏1" onclick="showFence1()">-->
+	<!--<input type="button" value="显示围栏2" onclick="showFence2()">-->
+	<!--<input type="button" value="采集定位点" onclick="savePoint()">-->
+	<br>
+	<div id="map" style="width: 1000px; height: 500px;z-index:1"></div>
+	<div id="mapTileContent"></div>
+	<br><span id="aaa"></span>
+	<!--<br><span id="bbb"></span><br>-->
+
+	<div id="floorContainer" style="position: absolute; top: 100px; right: 10px; width: 180px; height: 600px; padding: 5px;
+	display: none; opacity: 0.6; background-color: brown; border-width: thin; border-color: #000000; border-style: solid;z-index:2;overflow:auto">
+		<p>选择楼层:</p>
+		<ul id="floorMenu"></ul>
+		<br>
+		<p>选择待查看建筑构件:</p>
+		<div id="elementContainer"></div>
+	</div>
+
+	<div id="loadingTag" style="position: absolute; top: 300px; left: 300px; width: 250px; height: 20px; padding: 5px;
+	display: none; opacity: 0.6; background-color: #aaaaaa; border-width: thin; border-color: #ffffff; border-style: solid;z-index:100">
+		<span id="loadingStatus"></span>
+	</div>
+
+	<div id="alertTag" style="position: absolute; top: 300px; left: 300px; width: 250px; height: 20px; padding: 15px;
+	display: none; opacity: 0.6; background-color: #aaaaaa; border-width: thin; border-color: #000000; border-style: solid; z-index:101">
+		<span id="alertStatus"></span>
+	</div>
+</body>
+</html>

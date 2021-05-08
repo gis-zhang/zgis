@@ -1,0 +1,214 @@
+﻿<html>
+<head>
+	<title>地图api测试示例-2.5维</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../src/lib/leaflet-0.7.3/leaflet.css" />
+	<link rel="stylesheet" href="../dist/zmap.css" />
+	<!--<link rel="stylesheet" href="../src/lib/leaflet-extend/control/L.TextIcon.js" />-->
+
+	<script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
+	<!--<script src="../src/lib/threejs/three.js"></script>-->
+	<script src="../src/lib/threejs_new/three.js"></script>
+	<script src="../src/lib/threejs/ConvexGeometry.js"></script>
+	<script src="../src/lib/threebsp/ThreeBSP.js"></script>
+	<script src="../src/lib/stats.min.js"></script>
+	<script src="../dist/zmap-release.min.js"></script>
+	<!--<script src="data/building_nb_1.5w.js"></script>-->
+	<script>
+		var rotateX = 0, rotateY = 0; rotateZ = 0, map = null, sunH = 30, sunV = 45;
+
+		function load(){
+			//map = new ZMap('map', {sceneType: '3D', center:{x:120.293820214832, y:31.5801890000232}, initZoom: 18, maxZoom: 20});
+			map = new ZMap('map', {sceneType: '3D', center:{x:119.14573, y:36.71813}, initZoom: 17, maxZoom: 20});
+			map.rotateByEuler({x: 70, y:0, z:0});
+		}
+
+		function x_add(){
+			//rotateX += 5;
+			rotateX = 2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function x_sub(){
+//			rotateX -= 5;
+			rotateX = -2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function y_add(){
+//			rotateY += 5;
+			rotateY = 5;
+			rotateX = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function y_sub(){
+//			rotateY -= 5;
+			rotateY = -5;
+			rotateX = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function z_add(){
+			//rotateZ += 5;
+			rotateZ = 5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+		function z_sub(){
+			//rotateZ -= 5;
+			rotateZ = -5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+		function sun_up(){
+			sunV += 5;
+			map.setSunLight({h: sunH, v:sunV});
+		}
+
+		function sun_down(){
+			sunV -= 5;
+			map.setSunLight({h: sunH, v:sunV});
+		}
+
+		function refresh(){
+			//map._scene.setRotationByEuler({x: rotateX, y:rotateY, z:rotateZ});
+			map.rotateByEuler({x: rotateX, y:rotateY, z:rotateZ});
+		}
+
+		function reset(){
+			map._scene._sceneRender.resetCamera();
+			map._scene._sceneRender.render();
+		}
+
+		function zoomIn(){
+			map.zoomIn();
+		}
+
+		function zoomOut(){
+			map.zoomOut();
+		}
+
+		var added = false;
+		var layer1 = new Z.TDTVectorLayer();
+		var layer2 = new Z.TDTVectorAnnoLayer();
+		var layer3 = new Z.TDTRasterLayer();
+		var layer4 = new Z.TDTRasterAnnoLayer();
+
+		function addVectorLayer(){
+			map.addLayer(layer1, 0);
+//			map.addLayer(layer1, 0, Z.LayerGroup.BaseBgLayer);
+		}
+		function addVectorAnnoLayer(){
+			map.addLayer(layer2, 1);
+		}
+		function addRasterLayer(){
+			//map.addLayer(layer3, 0, Z.LayerGroup.BaseOverLayer);
+			map.addLayer(layer3, 2, Z.LayerGroup.BaseBgLayer);
+		}
+		function addRasterAnnoLayer(){
+			map.addLayer(layer4, 3, Z.LayerGroup.BaseBgLayer);
+			//map.addLayer(layer4, 1, Z.LayerGroup.BaseOverLayer);
+			//map.addLayer(layer2, 3, Z.LayerGroup.BaseOverLayer);
+		}
+		function removeVectorLayer(){
+			map.removeLayer(layer1);
+		}
+		function removeVectorAnnoLayer(){
+			map.removeLayer(layer2);
+		}
+		function removeRasterLayer(){
+			map.removeLayer(layer3);
+		}
+		function removeRasterAnnoLayer(){
+			map.removeLayer(layer4);
+		}
+
+		//"http://wfmap.weifang.gov.cn:8013/wmts/wfmap_vec"
+		var layer_25d = new Z.WMTSTileLayer("http://localhost:8080/wmts/wfmap_vec", {
+			minZoom: 13,
+			maxZoom: 17,
+			zoomOffset: -1,
+			tileInfo:{
+				levelDefine:[
+					{ "level": 0, "resolution": 1.40782880508533, "scale": 591658710.9 },
+					{ "level": 1, "resolution": 0.703125, "scale": 295497593.05879998 },
+					{ "level": 2, "resolution": 0.3515625, "scale": 147748796.52939999 },
+					{ "level": 3, "resolution": 0.17578125, "scale": 73874398.264699996 },
+					{ "level": 4, "resolution": 0.0878906250193568, "scale": 36937199.132349998 },
+					{ "level": 5, "resolution": 0.0439453125096784, "scale": 18468599.566174999 },
+					{ "level": 6, "resolution": 0.0219726562548392, "scale": 9234299.7830874994 },
+					{ "level": 7, "resolution": 0.0109863281274196, "scale": 4617149.8915437497 },
+					{ "level": 8, "resolution": 0.0054931640637098, "scale": 2308574.9457718749 },
+					{ "level": 9, "resolution": 0.0027465820318549957, "scale": 1154287.4728859374 },
+					{ "level": 10, "resolution": 0.0013732910159274978, "scale": 577143.73644296871 },
+					{ "level": 11, "resolution": 0.00068664549607834132, "scale": 288571.86822148436 },
+					{ "level": 12, "resolution": 0.00034332275992416907, "scale": 144285.934110742183 },
+					{ "level": 13, "resolution": 0.00017166136807812298, "scale": 72142.967055371089 },
+					{ "level": 14, "resolution": 8.5830684039061379E-05, "scale": 36071.483527685545 },
+					{ "level": 15, "resolution": 4.2915342019530649E-05, "scale": 18035.741763842772 },
+					{ "level": 16, "resolution": 2.1457682893727977E-05, "scale": 9017.8708819213862 },
+					{ "level": 17, "resolution": 1.0728841446864E-05, "scale": 4508.9354409606931 },
+					{ "level": 18, "resolution": 5.3644207234319882E-06, "scale": 2254.4677204803465 },
+					{ "level": 19, "resolution": 2.6822103617159941E-06, "scale": 1127.2338602401733 },
+					{ "level": 20, "resolution": 1.341105180858E-06, "scale": 563.61693012008664 }
+				]
+			}
+		});
+
+		function add25dLayer(){
+			map.addLayer(layer_25d);
+		}
+
+		function remove25dLayer(){
+			map.removeLayer(layer_25d);
+		}
+
+
+	</script>
+</head>
+<body onload="load()">
+	<!--<input type="button" value="addNewObject" onclick="addNewObject()">-->
+	<input type="button" value="重置相机位置" onclick="reset()">
+	<input type="button" value="旋转x+" onclick="x_add()">
+	<input type="button" value="旋转x-" onclick="x_sub()">
+	<!--<input type="button" value="旋转y+" onclick="y_add()">-->
+	<!--<input type="button" value="旋转y-" onclick="y_sub()">-->
+	<input type="button" value="旋转z+" onclick="z_add()">
+	<input type="button" value="旋转z-" onclick="z_sub()">
+	<!--<input type="button" value="太阳上升" onclick="sun_up()">-->
+	<!--<input type="button" value="太阳下落" onclick="sun_down()">-->
+	<input type="button" value="放大" onclick="zoomIn()">
+	<input type="button" value="缩小" onclick="zoomOut()">
+	<br>
+	<input type="button" value="添加天地图矢量底图" onclick="addVectorLayer()">
+	<input type="button" value="添加天地图矢量注记" onclick="addVectorAnnoLayer()">
+	<input type="button" value="添加天地图影像底图" onclick="addRasterLayer()">
+	<input type="button" value="添加天地图影像注记" onclick="addRasterAnnoLayer()">
+	<input type="button" value="移除天地图矢量底图" onclick="removeVectorLayer()">
+	<input type="button" value="移除天地图矢量注记" onclick="removeVectorAnnoLayer()">
+	<input type="button" value="移除天地图影像底图" onclick="removeRasterLayer()">
+	<input type="button" value="移除天地图影像注记" onclick="removeRasterAnnoLayer()">
+	<!--<input type="button" value="添加建筑物" onclick="loadBuildings()">-->
+	<br>
+	<input type="button" value="添加2.5维地图" onclick="add25dLayer()">
+	<input type="button" value="移除2.5维地图" onclick="remove25dLayer()">
+	<div id="map" style="width: 1280px; height: 800px;"></div>
+	<br><span id="aaa"></span>
+
+
+</body>
+</html>

@@ -1,0 +1,291 @@
+﻿<html>
+<head>
+	<title>地图api测试示例</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../src/lib/leaflet-0.7.3/leaflet.css" />
+	<link rel="stylesheet" href="../dist/zmap.css" />
+
+	<script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
+	<script src="../src/lib/threejs/three.js"></script>
+	<script src="../src/lib/threejs/ConvexGeometry.js"></script>
+	<script src="../src/lib/threebsp/ThreeBSP.js"></script>
+	<script src="../src/lib/leaflet-extend/control/Util.js"></script>
+	<script src="../src/lib/leaflet-extend/layer/L.CustomTileLayer.js"></script>
+	<script src="../src/lib/leaflet-extend/layer/layer.wmts-src.js"></script>
+	<script src="../src/lib/leaflet-extend/layer/layer.tdt-src.js"></script>
+	<script src="../src/lib/leaflet-plugin/Leaflet.zoomslider-0.6.1/src/L.Control.Zoomslider.js"></script>
+	<script src="../src/lib/leaflet-extend/crs/L.CRS.CustomLevel.js"></script>
+	<script src="../src/lib/leaflet-extend/control/L.Control.Layers.Custom.js"></script>
+	<script src="../src/lib/leaflet-plugin/MiniMap/Control.MiniMap.min.js"></script>
+	<script src="../src/lib/leaflet-extend/MapConfig.js" charset="GBK"></script>
+	<script src="../src/lib/leaflet-extend/Map.js"></script>
+	<script src="../dist/zmap-release.js"></script>
+	<script>
+		var rotateX = 0, rotateY = 0; rotateZ = 0, map = null, sunH = 30, sunV = 45;
+
+		function load(){
+			map = new ZMap('map', {sceneType: '3D'});
+
+//			map.on("click", function(){alert("click");});
+//			map.on("viewreset", function(){alert("viewreset");});
+			//addNewObject();
+
+//			document.getElementById("map").addEventListener( 'click', clickMap, false );
+		}
+
+		function x_add(){
+			//rotateX += 5;
+			rotateX = 2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function x_sub(){
+//			rotateX -= 5;
+			rotateX = -2;
+			rotateY = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function y_add(){
+//			rotateY += 5;
+			rotateY = 5;
+			rotateX = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function y_sub(){
+//			rotateY -= 5;
+			rotateY = -5;
+			rotateX = 0;
+			rotateZ = 0;
+			refresh();
+		}
+
+		function z_add(){
+			//rotateZ += 5;
+			rotateZ = 5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+		function z_sub(){
+			//rotateZ -= 5;
+			rotateZ = -5;
+			rotateY = 0;
+			rotateX = 0;
+			refresh();
+		}
+
+		function x_pan_add(){
+			map.panBy(10);
+			showBbox();
+		}
+
+		function x_pan_sub(){
+			map.panBy(-10);
+			showBbox();
+		}
+
+		function y_pan_add(){
+			//map._scene.translateByGL({x: 0, y:1, z:0});
+			map.panBy(0, 50);
+			showBbox();
+		}
+
+		function y_pan_sub(){
+			//map._scene.translateByGL({x: 0, y:-1, z:0});
+			map.panBy(0, -50);
+			showBbox();
+		}
+
+//		function z_pan_add(){
+//			//map._scene.translateByGL({x: 0, y:0, z:1});
+//			//map.panBy(0, -50);
+//			showBbox();
+//		}
+//
+//		function z_pan_sub(){
+//			//map._scene.translateByGL({x: 0, y:0, z:-1});
+//			//map.panBy(0, -50);
+//			showBbox();
+//		}
+
+		function sun_up(){
+			sunV += 5;
+			map.setSunLight({h: sunH, v:sunV});
+		}
+
+		function sun_down(){
+			sunV -= 5;
+			map.setSunLight({h: sunH, v:sunV});
+		}
+
+		function clickMap(event){
+			var point = map.screenPointToLatLng(new Z.Point(event.clientX,event.clientY));
+			alert(point.lat + "," + point.lng);
+		}
+
+		function refresh(){
+			//map._scene.setRotationByEuler({x: rotateX, y:rotateY, z:rotateZ});
+			map.rotateByEuler({x: rotateX, y:rotateY, z:rotateZ});
+			//map._scene.render();
+
+			showBbox();
+		}
+
+		function showBbox(){
+			var visibleBounds = map._scene._sceneRender.getVisibleGLBounds();
+			var visibleLatLngBounds = map.getContentBounds();
+			document.getElementById("aaa").innerHTML = "Left:x=" + visibleBounds.getBottomLeft().x + ";y=" + visibleBounds.getBottomLeft().y + ";z=" + visibleBounds.getBottomLeft().z +
+					"。Right:x=" + visibleBounds.getTopRight().x + ";y=" + visibleBounds.getTopRight().y + ";z=" + visibleBounds.getTopRight().z;
+			document.getElementById("bbb").innerHTML = "Left:x=" + visibleLatLngBounds.getWest() + ";y=" + visibleLatLngBounds.getSouth() + ";z=" + visibleLatLngBounds.getBottom() +
+					"。Right:x=" + visibleLatLngBounds.getEast() + ";y=" + visibleLatLngBounds.getNorth() + ";z=" + visibleLatLngBounds.getTop();
+		}
+
+		function reset(){
+			map._scene._sceneRender.resetCamera();
+			map._scene._sceneRender.render();
+		}
+		function addNewObject(){
+			var planeGeometry = new THREE.PlaneGeometry(30,20,5,5);
+			//var planeMaterial = new THREE.MeshBasicMaterial({color: 0xcccc00, wireframe: true});
+			var planeMaterial = new THREE.MeshLambertMaterial({color: 0xcccc00, shading: THREE.FlatShading});
+//			var planeMaterial = new THREE.MeshPhongMaterial( {
+//				shininess: 80,
+//				color: 0xffffff,
+//				specular: 0xffffff
+//			} );
+			planeMaterial.polygonOffset = true;
+			planeMaterial.polygonOffsetFactor = 1;
+			planeMaterial.polygonOffsetUnits = 1;
+			var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+//			plane.castShadow = true;
+			plane.receiveShadow = true;
+			plane.renderOrder = -1;
+			map._scene._sceneRender.addObject(plane);
+
+			var boxGeometry = new THREE.BoxGeometry(10,5,5);
+			//boxGeometry.computeFaceNormals();
+			//var boxMaterial = new THREE.MeshBasicMaterial({color: 0xcc0000, wireframe: true});
+			//var boxMaterial = new THREE.MeshLambertMaterial({color: 0xcc0000, shading: THREE.FlatShading, overdraw: 0.5});
+			//var boxMaterial = new THREE.MeshLambertMaterial({color: 0xcc0000});
+			var boxMaterial = new THREE.MeshPhongMaterial( {color: 0xff00ff} );
+			boxMaterial.polygonOffset = true;
+			boxMaterial.polygonOffsetFactor = 1;
+			boxMaterial.polygonOffsetUnits = 1;
+			var box = new THREE.Mesh(boxGeometry, boxMaterial);
+			box.position.z = 2;
+			box.castShadow = true;
+			//box.receiveShadow = true;
+			map._scene._sceneRender.addObject(box);
+
+			var axisHelper = new THREE.AxisHelper( 50 );
+			map._scene._sceneRender.addObject( axisHelper );
+
+			map._scene._sceneRender.render();
+
+//			var orthoBounds = map._scene._sceneRender.getOrthoGLBounds();
+//			alert("Left:x=" + orthoBounds.getBottomLeft().x + ";y=" + orthoBounds.getBottomLeft().y + ";z=" + orthoBounds.getBottomLeft().z +
+//					"Right:x=" + orthoBounds.getTopRight().x + ";y=" + orthoBounds.getTopRight().y + ";z=" + orthoBounds.getTopRight().z);
+//
+//			var visibleBounds = map._scene._sceneRender.getVisibleGLBounds();
+//			alert("Left:x=" + visibleBounds.getBottomLeft().x + ";y=" + visibleBounds.getBottomLeft().y + ";z=" + visibleBounds.getBottomLeft().z +
+//					"Right:x=" + visibleBounds.getTopRight().x + ";y=" + visibleBounds.getTopRight().y + ";z=" + visibleBounds.getTopRight().z);
+		}
+
+		function zoomIn(){
+			map.zoomIn();
+		}
+
+		function zoomOut(){
+			map.zoomOut();
+		}
+
+		var added = false;
+		var layer1 = new Z.TDTVectorLayer();
+		var layer2 = new Z.TDTVectorAnnoLayer();
+		var layer3 = new Z.TDTRasterLayer();
+		var layer4 = new Z.TDTRasterAnnoLayer();
+//		function addNewLayer(){
+////			if(!added){
+//				var layer = new Z.TDTVectorLayer();
+//				map.addLayer(layer);
+//				var layer1 = new Z.TDTVectorAnnoLayer();
+//				map.addLayer(layer1,1);
+//				added = true;
+////			}
+//		}
+
+		function addVectorLayer(){
+			map.addLayer(layer1, 0);
+//			map.addLayer(layer1, 0, Z.LayerGroup.BaseOverLayer);
+		}
+		function addVectorAnnoLayer(){
+			map.addLayer(layer2, 1);
+		}
+		function addRasterLayer(){
+			//map.addLayer(layer3, 0, Z.LayerGroup.BaseOverLayer);
+			map.addLayer(layer3, 2, Z.LayerGroup.BaseBgLayer);
+		}
+		function addRasterAnnoLayer(){
+			map.addLayer(layer4, 3, Z.LayerGroup.BaseBgLayer);
+			//map.addLayer(layer4, 1, Z.LayerGroup.BaseOverLayer);
+			//map.addLayer(layer2, 3, Z.LayerGroup.BaseOverLayer);
+		}
+		function removeVectorLayer(){
+			map.removeLayer(layer1);
+		}
+		function removeVectorAnnoLayer(){
+			map.removeLayer(layer2);
+		}
+		function removeRasterLayer(){
+			map.removeLayer(layer3);
+		}
+		function removeRasterAnnoLayer(){
+			map.removeLayer(layer4);
+		}
+	</script>
+</head>
+<body onload="load()">
+	<input type="button" value="addNewObject" onclick="addNewObject()">
+	<input type="button" value="重置相机位置" onclick="reset()">
+	<input type="button" value="旋转x+" onclick="x_add()">
+	<input type="button" value="旋转x-" onclick="x_sub()">
+	<input type="button" value="旋转y+" onclick="y_add()">
+	<input type="button" value="旋转y-" onclick="y_sub()">
+	<input type="button" value="旋转z+" onclick="z_add()">
+	<input type="button" value="旋转z-" onclick="z_sub()">
+	<input type="button" value="移动x+" onclick="x_pan_add()">
+	<input type="button" value="移动x-" onclick="x_pan_sub()">
+	<input type="button" value="移动y+" onclick="y_pan_add()">
+	<input type="button" value="移动y-" onclick="y_pan_sub()">
+	<!--<input type="button" value="移动z+" onclick="z_pan_add()">-->
+	<!--<input type="button" value="移动z-" onclick="z_pan_sub()">-->
+	<input type="button" value="太阳上升" onclick="sun_up()">
+	<input type="button" value="太阳下落" onclick="sun_down()">
+	<input type="button" value="放大" onclick="zoomIn()">
+	<input type="button" value="缩小" onclick="zoomOut()">
+	<br>
+	<input type="button" value="添加天地图矢量底图" onclick="addVectorLayer()">
+	<input type="button" value="添加天地图矢量注记" onclick="addVectorAnnoLayer()">
+	<input type="button" value="添加天地图影像底图" onclick="addRasterLayer()">
+	<input type="button" value="添加天地图影像注记" onclick="addRasterAnnoLayer()">
+	<input type="button" value="移除天地图矢量底图" onclick="removeVectorLayer()">
+	<input type="button" value="移除天地图矢量注记" onclick="removeVectorAnnoLayer()">
+	<input type="button" value="移除天地图影像底图" onclick="removeRasterLayer()">
+	<input type="button" value="移除天地图影像注记" onclick="removeRasterAnnoLayer()">
+	<br><span id="aaa"></span>
+	<br><span id="bbb"></span><br>
+	<div id="map" style="width: 1000px; height: 800px"></div>
+
+
+</body>
+</html>
