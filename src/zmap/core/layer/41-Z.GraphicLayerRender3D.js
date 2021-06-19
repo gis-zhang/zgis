@@ -2,7 +2,7 @@
  * Created by Administrator on 2015/10/31.
  */
 Z.GraphicLayerRender3D = Z.IGraphicLayerRender.extend({
-    initialize: function(options){
+    initialize: function(urls, options){
         this.options = {};
         this.options = Z.Util.applyOptions(this.options, options, false);
 

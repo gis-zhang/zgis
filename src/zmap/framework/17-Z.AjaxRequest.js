@@ -3,7 +3,7 @@
 
 Z.AjaxRequest = (function() {
 
-    function load(url, callback, errorCallback) {
+    function load(url, callback, errorCallback, contentType) {
         var req = new XMLHttpRequest();
 
         req.onreadystatechange = function() {
@@ -23,6 +23,12 @@ Z.AjaxRequest = (function() {
         }
 
         req.open('GET', url);
+
+        if(contentType){
+            req.setRequestHeader("Content-Type",contentType);
+            //req.responseType = "text";
+        }
+
         req.send(null);
 
         return {
@@ -57,7 +63,7 @@ Z.AjaxRequest = (function() {
             });
         },
 
-        getJSON : function(url, callback, scope) {
+        getJSON : function(url, callback, scope, contentType) {
             return load(url, function(res) {
                 if (res.responseText) {
                     var json;
@@ -74,10 +80,93 @@ Z.AjaxRequest = (function() {
             },function(e){
                 console.warn('ajax request failed');
                 callback.call(scope, "");
-            });
+            },
+            contentType);
         },
 
         destroy : function() {}
     };
 
 }());
+
+
+Z.JSONPRequest = (function() {
+    var scriptTag = null;
+
+    function addScriptTag(src) {
+        var script = document.createElement('script');
+        script.setAttribute("type","text/javascript");
+        script.src = src;
+        document.body.appendChild(script);
+
+        return script;
+    }
+
+    function removeScriptTag(instanceId){
+        var scriptTagElement = scriptTag[instanceId];
+        
+        if(scriptTagElement){
+            document.body.removeChild(scriptTagElement);
+        }   
+    }
+
+    function loadData (jsonpSrc, customCallback, customScope) {
+        var instanceId = getInstanceId();
+        // var callbackName = "Z['JSONPRequest']['osmbuildingCallback']['" + instanceId + "']";
+        var callbackName = "jsonpCallbackTest";
+        var callbackFunc = getCallback(instanceId, customCallback, customScope);
+        registerCallback(instanceId, callbackFunc);
+        scriptTag[instanceId] = addScriptTag(jsonpSrc + '?callback=' + callbackName);
+    }
+
+    var jsonpCallback = {};
+
+    var getCallback = function(instanceId, customCallback, customScope){
+        //var instanceId = null;
+    
+        return function(data){
+            removeScriptTag(instanceId);
+            unregisterCallback(instanceId);
+            customCallback.call(customScope, data);
+        }
+    };
+
+    function registerCallback(id, callback){
+        Z.JSONPRequest.osmbuildingCallback[id] = callback;
+    }
+
+    function unregisterCallback(id){
+        if(Z.JSONPRequest.osmbuildingCallback[id]){
+            delete Z.JSONPRequest.osmbuildingCallback[id];
+        }
+    }
+
+    var searialsNo = 0;
+    function getInstanceId(){
+        var now = new Date();
+        var year = now.getFullYear().toString();
+        var month = now.getMonth() + 1;
+        var day = now.getDate();
+        var hour = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+        var no = year+month+day+hour+minutes+seconds + (searialsNo++);
+        
+        return no;
+    }
+
+    //***************************************************************************
+
+    return {
+        getJSON : function(url, callback, scope) {
+            //var instanceId = getInstanceId();
+            
+            return loadData(url, callback, scope);
+        },
+
+        destroy : function() {}
+    };
+
+}());
+
+Z.JSONPRequest.osmbuildingCallback = {};

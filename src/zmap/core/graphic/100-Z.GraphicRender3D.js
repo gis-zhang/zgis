@@ -309,40 +309,47 @@ Z.GraphicRender3D = Z.IGraphicRender.extend({
             return;
         }
 
-        if(material.materials){
-            var materialsLength = material.materials.length;
+        var mtrl = (material instanceof Array) ? material : [material];
 
-            for(var i = 0; i < materialsLength; i++){
-                this._disposeMaterial(material.materials[i]);
-            }
-        }else{
-            if(material.map){
-                material.map.dispose();
-            }
+        for(var k = 0; k < mtrl.length; k++){
+            var curMaterial = mtrl[k];
 
-            if(material.alphaMap){
-                material.alphaMap.dispose();
-            }
-
-            if(material.aoMap){
-                material.aoMap.dispose();
-            }
-
-            if(material.emissiveMap){
-                material.emissiveMap.dispose();
-            }
-
-            if(material.lightMap){
-                material.lightMap.dispose();
-            }
-
-            if(material.specularMap){
-                material.specularMap.dispose();
-            }
-
-            if(material.dispose){
-                material.dispose();
+            if(curMaterial.materials){
+                var materialsLength = curMaterial.materials.length;
+    
+                for(var i = 0; i < materialsLength; i++){
+                    this._disposeMaterial(curMaterial.materials[i]);
+                }
+            }else{
+                if(curMaterial.map){
+                    curMaterial.map.dispose();
+                }
+    
+                if(curMaterial.alphaMap){
+                    curMaterial.alphaMap.dispose();
+                }
+    
+                if(curMaterial.aoMap){
+                    curMaterial.aoMap.dispose();
+                }
+    
+                if(curMaterial.emissiveMap){
+                    curMaterial.emissiveMap.dispose();
+                }
+    
+                if(curMaterial.lightMap){
+                    curMaterial.lightMap.dispose();
+                }
+    
+                if(curMaterial.specularMap){
+                    curMaterial.specularMap.dispose();
+                }
+    
+                if(curMaterial.dispose){
+                    curMaterial.dispose();
+                }
             }
         }
+        
     }
 });

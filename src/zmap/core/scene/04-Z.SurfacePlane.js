@@ -52,6 +52,8 @@ Z.SurfacePlane = Z.Class.extend({
         this._applyEvents("on");
         this._onAddDone = true;
         //this.needsUpdate = true;
+
+        //document.getElementById("mapTileContent").appendChild(this._tilePlane.material.map.image);
     },
 
     onRemove: function(){
@@ -127,8 +129,13 @@ Z.SurfacePlane = Z.Class.extend({
             this._tileTexture.clear();
             this._tileTexture.draw();
 
-            if(this._tilePlane.material.map){
-                this._tilePlane.material.map.needsUpdate = true;
+            if(this._tilePlane.material){
+                if(this._tilePlane.material.map){
+                    this._tilePlane.material.map.needsUpdate = true;
+                }
+
+                console.info("Z.SurfacePlane.draw() done");
+                this._tilePlane.material.needsUpdate = true;
             }
         }
 

@@ -1,12 +1,17 @@
 /**
  * Created by Administrator on 2016/8/21.
  */
-Z.VectorTileLoader = function(url, loadContext){
+Z.VectorTileLoader = function(urls, loadContext){
     this._compositeGraphics = {};
     this._graphics = {};
 
-    //this._url = url || "http://c.data.osmbuildings.org/0.2/anonymous/tile";
-    this._url = url || "/0.2/anonymous/tile";
+    this._urls = urls || [];//"https://a.data.osmbuildings.org/0.2/ph2apjye/tile";
+
+    if(!(this._urls instanceof Array)){
+        this._urls = [this._urls];
+    }
+
+    //this._url = url || "/0.2/anonymous/tile";
     //{layer: null, container: null, scene: null}
     this._context = loadContext;
 
@@ -57,6 +62,8 @@ Z.VectorTileLoader.prototype.loadVectorTile = function(level, row, col, callback
 
     var url = this._getTileUrl(level, row, col);
 
+    //Z.JSONPRequest.getJSON(url, callback, scope);
+    // Z.AjaxRequest.getJSON(url, callback, scope, "application/json");
     Z.AjaxRequest.getJSON(url, callback, scope);
 }
 
@@ -145,11 +152,33 @@ Z.VectorTileLoader.prototype._getMeshes = function(mesh){
 }
 
 Z.VectorTileLoader.prototype._getTileUrl = function(level, row, col){
-    if(!this._context){
+    if(!this._context || this._urls.length <= 0){
         return;
     }
 
-    return this._url + "/" + level + "/" + col + "/" + row + ".json";
+    var urlLength = this._urls.length;
+    var tileIndex = (row + col) % urlLength;
+    var curUrl = this._urls[tileIndex];
+
+    while(!curUrl && tileIndex < (urlLength - 1)){
+        curUrl = this._urls[++tileIndex];
+    }
+
+    if(!curUrl){
+        return null;
+    }
+
+    var tileUrl = null;
+
+    if(curUrl.indexOf("{level}") > 0 || curUrl.indexOf("{col}") > 0 || curUrl.indexOf("{row}") > 0){
+        tileUrl = curUrl.replace("{level}", level);
+        tileUrl = tileUrl.replace("{col}", col);
+        tileUrl = tileUrl.replace("{row}", row);
+    }else{
+        tileUrl = curUrl + "/" + level + "/" + col + "/" + row + ".json";
+    }
+
+    return tileUrl;
     //var bottomLeft = sceneBounds.getBottomLeft(),
     //    topRight = sceneBounds.getTopRight(),
     //    latLngBL, latLngTR, latLngBounds;

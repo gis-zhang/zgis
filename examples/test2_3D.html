@@ -8,9 +8,10 @@
 	<link rel="stylesheet" href="../src/lib/leaflet-0.7.3/leaflet.css" />
 	<link rel="stylesheet" href="../dist/zmap.css" />
 
-	<script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
-	<script src="../src/lib/threejs/three.js"></script>
 	<!--<script src="../src/lib/threejs_new/three.js"></script>-->
+
+	<!-- <script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
+	<script src="../src/lib/threejs/three.js"></script>
 	<script src="../src/lib/threejs/ConvexGeometry.js"></script>
 	<script src="../src/lib/threebsp/ThreeBSP.js"></script>
 	<script src="../src/lib/leaflet-extend/control/Util.js"></script>
@@ -22,8 +23,8 @@
 	<script src="../src/lib/leaflet-extend/control/L.Control.Layers.Custom.js"></script>
 	<script src="../src/lib/leaflet-plugin/MiniMap/Control.MiniMap.min.js"></script>
 	<script src="../src/lib/leaflet-extend/MapConfig.js" charset="GBK"></script>
-	<script src="../src/lib/leaflet-extend/Map.js"></script>
-	<!--<script src="../dist/zmap-release.js"></script>-->
+	<script src="../src/lib/leaflet-extend/Map.js"></script> -->
+	<script src="../dist/zmap_all_in_one.js"></script>
 	<script>
 		var rotateX = 0, rotateY = 0; rotateZ = 0, map = null, sunH = 30, sunV = 45, container3D = new THREE.Object3D(),
 				container3D_1 = new THREE.Object3D(), container3D_2 = new THREE.Object3D();
@@ -244,8 +245,8 @@
 		}
 	</script>
 </head>
-<!--<body onload="load()">-->
-<body>
+<body onload="load()">
+<!-- <body> -->
 	<input type="button" value="addNewObject" onclick="addNewObject()">
 	<input type="button" value="重置相机位置" onclick="reset()">
 	<input type="button" value="旋转x+" onclick="x_add()">
@@ -264,7 +265,7 @@
 	<input type="button" value="太阳下落" onclick="sun_down()">
 	<!--<br><span id="aaa"></span>-->
 	<!--<br><span id="bbb"></span><br>-->
-	<!--<div id="map" style="width: 1000px; height: 800px"></div>-->
+	<div id="map" style="width: 1000px; height: 800px"></div>
 
 
 </body>

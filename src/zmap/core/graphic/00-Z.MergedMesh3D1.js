@@ -389,7 +389,8 @@ Z.MergedMesh3D1.prototype._addMeshToBuffer = function(mesh){
         faceOffset = db.vertices.length;
 
     var materials1 = db.materials,//materials1 = mesh1.material,
-        materials2 = (mesh.material instanceof THREE.MultiMaterial) ? mesh.material.materials : [mesh.material],
+        materials2 = (mesh.material instanceof THREE.MultiMaterial) ? mesh.material.materials : 
+            ((mesh.material instanceof Array) ? mesh.material : [mesh.material]),
         materialMapping = this._mergeMaterial(materials1, materials2);
     /****************************************为了防止faces数组过大导致栈溢出，实行分段复制*****************************************/
     //for(var i = 0, faceLength = geometry.faces.length; i < faceLength; i++){
@@ -485,8 +486,9 @@ Z.MergedMesh3D1.prototype._createMeshFromDataBuffer = function(dataBuffer){
     //geometry.elementsNeedUpdate = true;
     //geometry.groupsNeedUpdate = true;
 
-    var mtl = new THREE.MultiMaterial(dataBuffer.materials);
-    var newMesh = new Z.Mesh(geometry, mtl);
+    // var mtl = new THREE.MultiMaterial(dataBuffer.materials);
+    // var newMesh = new Z.Mesh(geometry, mtl);
+    var newMesh = new Z.Mesh(geometry, dataBuffer.materials);
 
     if(this._graphicGrid){
         newMesh.raycastIndex = this._graphicGrid;

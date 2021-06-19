@@ -14,8 +14,8 @@ var DefaultZMapConfig = {
     maxZoom:18,            //最大可显示级别
     selectionMutex: true,
     showFrameRate: false,
-    //pyramidId: "TDT",
-    pyramidId: "TDT_UNLIMIT",
+    pyramidId: "TDT",
+    //pyramidId: "TDT_UNLIMIT",
     pyramidDefine:null,
     //pyramidDefine: {
     //    type: "FixedMultiple",

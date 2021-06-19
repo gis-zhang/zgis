@@ -81,7 +81,8 @@ Z.ExtrudeRender3D = Z.GraphicRender3D.extend({
         for(var geomLength = 0; geomLength < geometrys.length; geomLength++){
             //var mesh = new THREE.Mesh(geometrys[geomLength], new THREE.MeshFaceMaterial(material));
             //var mesh = new THREE.Mesh(geometrys[geomLength], new THREE.MultiMaterial(material));
-            var mesh = new Z.Mesh(geometrys[geomLength], new THREE.MultiMaterial(material));
+            //var mesh = new Z.Mesh(geometrys[geomLength], new THREE.MultiMaterial(material));
+            var mesh = new Z.Mesh(geometrys[geomLength], material);
             mesh.castShadow = true;
             //this._setBaseHeight(mesh);
 
@@ -161,7 +162,8 @@ Z.ExtrudeRender3D = Z.GraphicRender3D.extend({
             extrudeBaseHeight = this._layer.getSceneHeight(baseHeight),
             extrudeHeight = this._layer.getSceneHeight(height),//this._getSceneHeight(this._graphic.feature.shape.height),//this._getExtrudeHeight(),
             extrudeOptions ={
-                amount: extrudeHeight,
+                //amount: extrudeHeight,
+                depth: extrudeHeight,
                 bevelEnabled: false,
                 material: 0,
                 extrudeMaterial:1

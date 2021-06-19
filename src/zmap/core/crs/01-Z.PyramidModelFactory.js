@@ -6,7 +6,9 @@ Z.PyramidModelFactory.create = function(options){
     var id = options.pyramidId;
     var pyramidOptions = options.pyramidDefine;
 
-    if(pyramidOptions){
+    if(Z.PyramidModel[id]){
+        return new Z.PyramidModel[id]();
+    }else if(pyramidOptions && pyramidOptions.params){
         var pyramidGrid = null;
 
         if(pyramidOptions.type === "CustomLevel"){
@@ -26,8 +28,6 @@ Z.PyramidModelFactory.create = function(options){
         //return new Z.PyramidModel(pyramidGrid, {crs: crs});
 
         return new Z.PyramidModel(pyramidGrid, crs, options.projModel);
-    }else if(Z.PyramidModel[id]){
-        return new Z.PyramidModel[id]();
     }else{
         return new Z.PyramidModel.TDT();
     }

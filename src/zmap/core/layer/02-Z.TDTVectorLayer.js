@@ -3,8 +3,8 @@
  */
 //Z.TDTVectorLayer = Z.TileLayer.extend({
 Z.TDTVectorLayer = Z.AbstractTDTLayer.extend({
-    initialize: function(){
-        var urlArray = [(Z.Globe.proxy || "") + "/vec_c/wmts"];
+    initialize: function(token){
+        var urlArray = [(Z.Globe.TDTProxy || "") + "/vec_c/wmts"];
 
         var tdtOptions = {
             layer: 'vec',
@@ -13,6 +13,10 @@ Z.TDTVectorLayer = Z.AbstractTDTLayer.extend({
             tilematrixSet: 'c'//,
             //attribution: '天地图'
         };
+
+        if(token){
+            tdtOptions.token = token;
+        }
 
         Z.AbstractTDTLayer.prototype.initialize.call(this, urlArray, tdtOptions);
     }

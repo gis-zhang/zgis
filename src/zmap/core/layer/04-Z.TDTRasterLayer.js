@@ -2,8 +2,8 @@
  * Created by Administrator on 2015/11/2.
  */
 Z.TDTRasterLayer = Z.AbstractTDTLayer.extend({
-    initialize: function(){
-        var urlArray = [(Z.Globe.proxy || "") + "/img_c/wmts"];
+    initialize: function(token){
+        var urlArray = [(Z.Globe.TDTProxy || "") + "/img_c/wmts"];
 
         var tdtOptions = {
             layer: 'img',
@@ -13,6 +13,9 @@ Z.TDTRasterLayer = Z.AbstractTDTLayer.extend({
             //attribution: '天地图'
         };
 
+        if(token){
+            tdtOptions.token = token;
+        }
 
         Z.AbstractTDTLayer.prototype.initialize.call(this, urlArray, tdtOptions);
     }

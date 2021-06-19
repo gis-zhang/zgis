@@ -2,13 +2,13 @@
  * Created by Administrator on 2015/10/31.
  */
 Z.GraphicLayerTileRender3D = Z.GraphicLayerRender3D.extend({
-    initialize: function(options){
+    initialize: function(urls, options){
         //this._super = Z.GraphicLayerRender3D;
         Z.GraphicLayerRender3D.prototype.initialize.apply(this, arguments);
 
         this._graphicContainer = new Z.SceneThreePaneItem();
 
-        this._tileLoader = new Z.GraphicTileLoader();
+        this._tileLoader = new Z.GraphicTileLoader(urls);
         this._tileManager = new Z.GraphicTileManager(null, 150, 150);
         this._tileManager.tileLoader = this._tileLoader;
 

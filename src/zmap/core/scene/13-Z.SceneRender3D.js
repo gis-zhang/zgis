@@ -24,6 +24,7 @@ Z.SceneRender3D = function(container, options){
     //this._viewCenter = new THREE.Vector3(0, 0, 0);
 
     this._updateChecker = [];
+    this._removedUpdateChecker = [];
 
     this._postprocessingObject = null;
     this._enablePostprocessing = true;
@@ -130,6 +131,8 @@ Z.SceneRender3D.prototype = {
                 break;
             }
         }
+
+        this._removedUpdateChecker.push(checker);
     },
 
     render: function () {//console.info("render()");
@@ -183,9 +186,14 @@ Z.SceneRender3D.prototype = {
             }
 
             var needsUpdate = thisObj.needsUpdate;
+            var tpIns = Z.SingleTerrainPlane.getInstance();
 
             if(!needsUpdate){
-                needsUpdate = Z.SingleTerrainPlane.needsUpdate;
+                needsUpdate = tpIns.needsUpdate;
+            }
+
+            if(thisObj._removedUpdateChecker.length > 0){
+                needsUpdate = true;
             }
 
             var updateCheckers = thisObj._updateChecker;
@@ -204,13 +212,14 @@ Z.SceneRender3D.prototype = {
 
             //Z.ImageTextureManager.loadTextures();
             Z.TileManager.loadImages();
-            Z.SingleTerrainPlane.getInstance().refresh();
+            tpIns.refresh();
             Z.GraphicAnimation.run();
 
             if(thisObj._loopCount >= 5){
                 thisObj._loopCount = 0;
             }else if(needsUpdate){
-                thisObj._renderObject.clear();//console.info("thisObj._renderObject.render(thisObj._sceneObject, thisObj._cameraObject)");
+                thisObj._renderObject.clear();
+                // console.info("thisObj._renderObject.render(thisObj._sceneObject, thisObj._cameraObject)");
 
                 if(this._enablePostprocessing && this._postprocessingObject){
                     this._postprocessingObject.render();
@@ -227,30 +236,16 @@ Z.SceneRender3D.prototype = {
             //}
 
             for(i = 0; i < checkersLength; i++){
-                updateCheckers[i].resetUpdateState();
+                if(updateCheckers[i].resetUpdateState){
+                    updateCheckers[i].resetUpdateState();
+                }
             }
+
+            this._removedUpdateChecker = [];
 
             requestAnimationFrame(_doRender);
         }
     },
-
-    //_doRender: function(){
-    //    if(this.options.showFrameRate){
-    //        Z.RenderMonitor.update();
-    //    }
-    //
-    //    Z.ImageTextureManager.loadTextures();
-    //    Z.TileManager.loadImages();
-    //    Z.SingleTerrainPlane.getInstance().refresh();
-    //    Z.GraphicAnimation.run();
-    //    this._renderObject.clear();//console.info("thisObj._renderObject.render(thisObj._sceneObject, thisObj._cameraObject)");
-    //    this._renderObject.render(this._sceneObject, this._cameraObject);//console.info("render end");
-    //    requestAnimationFrame(this._doRender);
-    //},
-
-    //_render: function(){
-    //    this._renderObject.render(this._sceneObject, this._cameraObject);
-    //},
 
     resize: function(width, height){
         if(!width || !height){
@@ -312,16 +307,6 @@ Z.SceneRender3D.prototype = {
         return new Z.Point(vector.x, vector.y, vector.z);
     },
 
-    //setRotationByEuler: function(rotate){
-    //    if(rotate && (typeof rotate.x === "number") && (typeof rotate.y === "number") && (typeof rotate.z === "number")) {
-    //        rotate.x = rotate.x * Math.PI / 180;
-    //        rotate.y = rotate.y * Math.PI / 180;
-    //        rotate.z = rotate.z * Math.PI / 180;
-    //
-    //        this.setRotationByRad(rotate);
-    //    }
-    //},
-
     /*参数rotate为相对旋转角，单位为度*/
     rotateByEuler: function(rotate){
         if(rotate && (typeof rotate.x === "number") && (typeof rotate.y === "number") && (typeof rotate.z === "number")){
@@ -368,14 +353,6 @@ Z.SceneRender3D.prototype = {
             scale = new THREE.Vector3();
         vMatrix.decompose(translate, quaternion, scale);
 
-        //var cameraRotation = this.getRotateByRad();
-        //
-        //this.rotateByRad({
-        //    x: quaternion.x + cameraRotation.x,
-        //    y: quaternion.y + cameraRotation.y,
-        //    z: quaternion.z + cameraRotation.z,
-        //});
-
         this.rotateByRad(quaternion);
     },
 
@@ -419,18 +396,10 @@ Z.SceneRender3D.prototype = {
     },
 
     setAmbientColor: function(ambientColor){
-        //this._sceneObject.remove(this._ambientLightObject);
-        //this._ambientLightObject = new THREE.AmbientLight(ambientColor);
-        //this._sceneObject.add(this._ambientLightObject);
-        ////this.render();
         this._ambientLightObject.color = new THREE.Color(ambientColor);
     },
 
     setLightColor: function(lightColor){
-        //this._sceneObject.remove(this._lightObject);
-        //this._lightObject = new THREE.DirectionalLight(lightColor);
-        //this._sceneObject.add(this._lightObject);
-        ////this.render();
         this._lightObject.color = new THREE.Color(lightColor);
         this._reverseLightObject.color = new THREE.Color(lightColor);
     },
@@ -624,7 +593,7 @@ Z.SceneRender3D.prototype = {
         raycaster.setFromCamera( vector, this._cameraObject);
         var intersects = raycaster.intersectObjects( this._sceneObject.children, true),
             graphics = [], j = 0;
-console.info("intersectObjects:" + intersects.length);
+        // console.info("intersectObjects:" + intersects.length);
 
         if(intersects.length === 3){
             var sss = 0;
@@ -660,11 +629,6 @@ console.info("intersectObjects:" + intersects.length);
             return;
         }
 
-        //var radius = Math.sqrt(
-        //        Math.pow(glBounds.max.x - glBounds.min.x, 2) +
-        //        Math.pow(glBounds.max.y - glBounds.min.y, 2) +
-        //        Math.pow(glBounds.max.z - glBounds.min.z, 2)
-        //    ),
         var radius = new THREE.Vector3(glBounds.max.x - glBounds.min.x, glBounds.max.y - glBounds.min.y, glBounds.max.z - glBounds.min.z).length() / 2,
             cameraDistance = new THREE.Vector3(this.options.cameraPosition.x,
                 this.options.cameraPosition.y,
@@ -711,10 +675,6 @@ console.info("intersectObjects:" + intersects.length);
     },
 
     _getRotationMatrix: function(rotation, rawRotation){
-        //var rad = Math.PI / 180,
-        //    x_r = rawRotation.x + rotation.x * rad,
-        //    y_r = rawRotation.y + rotation.y * rad,
-        //    z_r = rawRotation.z + rotation.z * rad;
         var x_r = rawRotation ? (rawRotation.x * Math.PI / 180 + rotation.x) : rotation.x,
             y_r = rawRotation ? (rawRotation.y * Math.PI / 180 + rotation.y) : rotation.y,
             z_r = rawRotation ? (rawRotation.z * Math.PI / 180 + rotation.z) : rotation.z,
@@ -779,13 +739,6 @@ console.info("intersectObjects:" + intersects.length);
 
     _getIntersectPoint: function(raycaster, targetGeometry, viewPoint, camera){
         raycaster.setFromCamera( viewPoint, camera );
-        //var intersects = raycaster.intersectObjects( this._sceneObject.children );
-        //
-        //for ( var i = 0; i < intersects.length; i++ ) {
-        //    if(intersects[i].object === targetGeometry){
-        //        return intersects[i].point;        //point为世界坐标
-        //    }
-        //}
 
         var intersects = [];
         targetGeometry.raycast(raycaster, intersects);
@@ -801,10 +754,6 @@ console.info("intersectObjects:" + intersects.length);
     _getCameraBox: function(camera){
         var viewPortVertex = [[-1,1,-1], [-1,-1,-1], [1,-1,-1], [1,1,-1],
             [-1,1,1], [-1,-1,1], [1,-1,1], [1,1,1]],
-        //var viewPortVertex = [[-0.5,0.5,-0.5], [-0.5,-0.5,-0.5], [0.5,-0.5,-0.5], [0.5,0.5,-0.5],
-        //        [-0.5,0.5,0.5], [-0.5,-0.5,0.5], [0.5,-0.5,0.5], [0.5,0.5,0.5]],
-        //var viewPortVertex = [[-1,1,-0.5], [-1,-1,-0.5], [1,-1,-0.5], [1,1,-0.5],
-        //    [-1,1,0.5], [-1,-1,0.5], [1,-1,0.5], [1,1,0.5]],
             worldVertex = [],
             vector,
             vertexLength = viewPortVertex.length;

@@ -9,20 +9,27 @@
 	<link rel="stylesheet" href="../dist/zmap.css" />
 	<!--<link rel="stylesheet" href="../src/lib/leaflet-extend/control/L.TextIcon.js" />-->
 
-	<script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
 	<!--<script src="../src/lib/threejs/three.js"></script>-->
+
+	<!-- <script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
 	<script src="../src/lib/threejs_new/three.js"></script>
 	<script src="../src/lib/threejs/ConvexGeometry.js"></script>
 	<script src="../src/lib/threebsp/ThreeBSP.js"></script>
-	<script src="../src/lib/stats.min.js"></script>
-	<script src="../dist/zmap-release.js"></script>
-	<script src="data/building_nb.js"></script>
+	<script src="../src/lib/stats.min.js"></script> -->
+	<script src="../dist/zmap_all_in_one.js"></script>
+	<!-- <script src="data/building_nb.js"></script> -->
 	<script>
 		var rotateX = 0, rotateY = 0; rotateZ = 0, map = null, sunH = 30, sunV = 45;
 
 		function load(){
 			//map = new ZMap('map', {sceneType: '3D', center:{x:120.293820214832, y:31.5801890000232}, initZoom: 18, maxZoom: 20});
-			map = new ZMap('map', {sceneType: '3D', center:{x:121.55443213800004, y:29.87006611700008}, initZoom: 16, maxZoom: 20});
+			map = new ZMap('map', {
+					sceneType: '3D', 
+					center:{x:121.55443213800004, y:29.87006611700008}, 
+					initZoom: 12, 
+					maxZoom: 20,
+					pyramidId: "OSM"
+				});
 			map.rotateByEuler({x: 70, y:0, z:0});
 		}
 
@@ -103,7 +110,7 @@
 		}
 
 		var added = false;
-		var layer1 = new Z.TDTVectorLayer();
+		var layer1 = new Z.TDTVectorLayer("ef6151d9f0386f3b2a2fdf1d58fe9b32");
 		var layer2 = new Z.TDTVectorAnnoLayer();
 		var layer3 = new Z.TDTRasterLayer();
 		var layer4 = new Z.TDTRasterAnnoLayer();
@@ -145,6 +152,21 @@
 
 		function removeOSMTileLayer(){
 			map.removeLayer(layer5);
+		}
+
+		var layer6 = new Z.TiledGraphicLayer("https://a.data.osmbuildings.org/0.2/anonymous/tile", {
+		//var layer6 = new Z.TiledGraphicLayer("http://localhost:1800/0.2/anonymous/tile", {
+			enableInfoWindow: true,
+			levelMapping: [{start:15, end: 20, toLevel: 15}]
+		});
+
+		function addOSMVectorTileLayer(){
+			map.addLayer(layer6, 4, Z.LayerGroup.BaseBgLayer);
+			layer6.on("graphicclick", function(e){console.info("graphicclick")});
+		}
+
+		function removeOSMVectorTileLayer(){
+			map.removeLayer(layer6);
 		}
 
 		var buildingLayer;
@@ -344,6 +366,8 @@
 	<input type="button" value="移除天地图影像注记" onclick="removeRasterAnnoLayer()">
 	<input type="button" value="添加OSM瓦片底图" onclick="addOSMTileLayer()">
 	<input type="button" value="移除OSM瓦片底图" onclick="removeOSMTileLayer()">
+	<input type="button" value="添加OSM建筑" onclick="addOSMVectorTileLayer()">
+	<input type="button" value="移除OSM建筑" onclick="removeOSMVectorTileLayer()">
 	<input type="button" value="添加建筑物" onclick="loadBuildings()">
 	<div id="map" style="width: 1000px; height: 500px;"></div>
 	<div id="mapTileContent"></div>

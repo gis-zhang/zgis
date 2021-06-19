@@ -2,17 +2,18 @@
  * Created by Administrator on 2015/10/31.
  */
 Z.VectorTileRender3D = Z.GraphicLayerTileRender3D.extend({
-    initialize: function(options){
+    initialize: function(urls, options){
         //this._super = Z.GraphicLayerTileRender3D;
         Z.GraphicLayerTileRender3D.prototype.initialize.apply(this, arguments);
 
-        this._tileLoader = new Z.VectorTileLoader();
+        this._tileLoader = new Z.VectorTileLoader(urls);
 
         //var paramid = new Z.PyramidModel(),
         //var paramid = new Z.FixedMultiplePyramidModel(),
         //var paramid =  Z.PyramidModelFactory.create({crs: Z.CRS.EPSG3857}),
         var paramid =  options.pyramidModel,
-            levelMapping = [{start:15, end: 20, toLevel: 15}];
+            //levelMapping = [{start:15, end: 20, toLevel: 15}];
+            levelMapping = options.levelMapping;// || [{start:15, end: 20, toLevel: 15}];
         //this._tileManager = new Z.VectorTileManager(paramid, levelMapping, this.options.idProp);
         this._tileManager = new Z.VectorTileManager(paramid, levelMapping);
         this._tileManager.tileLoader = this._tileLoader;

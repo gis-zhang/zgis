@@ -3,7 +3,8 @@
  */
 Z.OSMTileLayer = Z.TileLayer.extend({
     initialize: function(urls, options){
-        urls = ["/v3/osmbuildings.kbpalbpk"];
+        //urls = ["/v3/osmbuildings.kbpalbpk"];
+        urls = ["https://tile.openstreetmap.org"];
 
         //var tileInfo = {
         //    //origin:new Z.LatLng(85.05113, -180),   //85.05112877980659

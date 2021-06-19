@@ -52,6 +52,36 @@ Z.TileManager = (function () {
         return image;
     }
 
+    var loadImageItem = function(item){
+        //var img = null;
+        var xmlhttp = new XMLHttpRequest();
+        var xhr = xmlhttp;
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // //console.log(xhr.responseText);
+                // //var res = xhr.responseText;
+                // var blob = new Uint8Array(this.response);
+                // //var img = new Image();
+                // var base = "data:image/png;base64," + Base64.encode(blob);
+                // item.src = base;
+                // //var spriteFrame = spImg.getComponent('cc.Sprite').spriteFrame;
+                // // //var texture=spriteFrame.getTexture();
+                // // var texture = new cc.Texture2D();
+                // // texture.generateMipmaps = false;
+                // // texture.initWithElement(img);
+                // // texture.handleLoadedTexture();
+                // // var newframe = new cc.SpriteFrame(texture);
+                // // spImg.getComponent('cc.Sprite').spriteFrame = newframe;
+
+                item.src = window.URL.createObjectURL(this.response);
+            }
+        };
+        xmlhttp.open("get", item._src);
+        //xhr.responseType = 'arraybuffer';
+        xhr.responseType = 'blob';
+        xhr.send(null);
+    }
+
     return {
         pushImageByUrl: function(url, success, error, scope){
             var image = new Image();
@@ -105,7 +135,8 @@ Z.TileManager = (function () {
                 if(item && !item._loadingCanceled && item._src){
                     sub--;
 
-                    item.src = item._src;
+                    //item.src = item._src;
+                    loadImageItem(item);
                     loadingsCount++;
                 }
             }

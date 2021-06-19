@@ -5,25 +5,35 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link rel="stylesheet" href="../src/lib/leaflet-0.7.3/leaflet.css" />
+	<!-- <link rel="stylesheet" href="../src/lib/leaflet-0.7.3/leaflet.css" /> -->
 	<link rel="stylesheet" href="../dist/zmap.css" />
 	<!--<link rel="stylesheet" href="../src/lib/leaflet-extend/control/L.TextIcon.js" />-->
 
-	<script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
-	<!--<script src="../src/lib/threejs/three.js"></script>-->
+	<!-- <script src="../src/lib/leaflet-0.7.3/leaflet-src.js"></script>
 	<script src="../src/lib/threejs_new/three.js"></script>
 	<script src="../src/lib/threejs/ConvexGeometry.js"></script>
 	<script src="../src/lib/threebsp/ThreeBSP.js"></script>
 	<script src="../src/lib/stats.min.js"></script>
-	<!--<script src="../dist/zmap-release.min.js"></script>-->
 	<script src="../dist/zmap-release.js"></script>
-	<script src="data/building_nb.js"></script>
+	<script src="data/building_nb.js"></script> -->
+	<!-- <script src="../src/lib/jquery-3.6.0.min.js"></script> -->
+	<script src="../dist/zmap_all_in_one.js"></script>
 	<script>
 		var rotateX = 0, rotateY = 0; rotateZ = 0, map = null, sunH = 30, sunV = 45;
 
+		var jsonpCallbackTest = function(data){
+			console.info(data);
+		}
+
 		function load(){
 			//map = new ZMap('map', {sceneType: '3D', center:{x:120.293820214832, y:31.5801890000232}, initZoom: 18, maxZoom: 20});   //宁波
-			map = new ZMap('map', {sceneType: '3D', center:{x:121.5031, y:31.2387}, initZoom: 16, maxZoom: 20});    //上海
+			map = new ZMap('map', {
+				sceneType: '3D', 
+				center:{x:121.5031, y:31.2387}, 
+				initZoom: 16, 
+				maxZoom: 20,
+				pyramidId: "OSM"
+			});    //上海
 			//map = new ZMap('map', {sceneType: '3D', center:{x:13.41143, y:52.52086}, initZoom: 16, maxZoom: 20});   //
 			map.rotateByEuler({x: 45, y:0, z:0});
 		}
@@ -150,10 +160,29 @@
 			map.removeLayer(layer5);
 		}
 
-		var layer6 = new Z.TiledGraphicLayer({enableInfoWindow: true});
+		var layer6 = new Z.TiledGraphicLayer("https://a.data.osmbuildings.org/0.2/anonymous/tile", {
+		//var layer6 = new Z.TiledGraphicLayer("http://localhost:1800/0.2/anonymous/tile", {
+			enableInfoWindow: true,
+			levelMapping: [{start:15, end: 20, toLevel: 15}]
+		});
 		//layer6.on("graphicclick", function(e){console.info("graphicclick")}); //e.objects[0]
 
 		function addOSMVectorTileLayer(){
+
+			// $.ajax({
+			// 	url: "https://a.data.osmbuildings.org/0.2/ph2apjye/tile/15/27442/13387.json",
+			// 	jsonp: "callback",
+			// 	dataType: "jsonp",
+			// 	data: {
+			// 		q: "select title,abstract,url from search.news where query=\"cat\"",
+			// 		format: "json"
+			// 	},
+
+			// 	success: function( response ) {
+			// 		console.log( response );
+			// 	}
+			// });
+
 			map.addLayer(layer6, 4, Z.LayerGroup.BaseBgLayer);
 			layer6.on("graphicclick", function(e){console.info("graphicclick")});
 		}

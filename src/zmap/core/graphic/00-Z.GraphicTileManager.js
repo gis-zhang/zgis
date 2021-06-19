@@ -2,7 +2,7 @@
  * Created by Administrator on 2016/8/21.
  */
 Z.GraphicTileManager = function(center, gridWidth, gridHeight){
-    this._center = center || new L.point(0, 0, 0);
+    this._center = center || new Z.Point(0, 0, 0);
     this._gridWidth = gridWidth || 100;         //单元格网宽度（webgl坐标）
     this._gridHeight = gridHeight || 100;       //单元格网高度（webgl坐标）
     this._graphicTiles = {};

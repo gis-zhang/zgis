@@ -31,10 +31,16 @@ Z.Mesh.prototype.dispose = function(){
 
         if(this.material instanceof THREE.MultiMaterial){
             materials = this.material.materials;
+        }else if(this.material instanceof Array){
+            materials = this.material;
         }
 
         for(var i = 0; i < materials.length; i++){
             var curMaterial = materials[i];
+
+            if(!curMaterial){
+                continue;
+            }
 
             if(curMaterial.map){
                 curMaterial.map.dispose();

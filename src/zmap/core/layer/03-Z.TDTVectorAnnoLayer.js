@@ -2,8 +2,8 @@
  * Created by Administrator on 2015/11/2.
  */
 Z.TDTVectorAnnoLayer = Z.AbstractTDTLayer.extend({
-    initialize: function(){
-        var urlArray = [(Z.Globe.proxy || "") + "/cva_c/wmts"];
+    initialize: function(token){
+        var urlArray = [(Z.Globe.TDTProxy || "") + "/cva_c/wmts"];
 
         var tdtOptions = {
             layer: 'cva',
@@ -12,6 +12,10 @@ Z.TDTVectorAnnoLayer = Z.AbstractTDTLayer.extend({
             tilematrixSet: 'c'//,
             //attribution: '天地图'
         };
+
+        if(token){
+            tdtOptions.token = token;
+        }
 
         Z.AbstractTDTLayer.prototype.initialize.call(this, urlArray, tdtOptions);
     }

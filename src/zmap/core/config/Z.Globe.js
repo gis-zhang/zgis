@@ -7,7 +7,7 @@ Z.Globe.Layer = {
     layerGroupSize: 1000
 };
 
-Z.Globe.Proxy = "http://localhost:8080";
+Z.Globe.TDTProxy = "https://t0.tianditu.gov.cn";
 
 Z.Globe.Building = {
     METERS_PER_LEVEL: 3,

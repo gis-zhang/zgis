@@ -79,7 +79,6 @@ Z.AggragatedSurfaceTexture = Z.CommonCanvasTexture.extend({
 
             if(layerOptions){
                 this._layers[layerId].options = layerOptions;
-                //console.info("updateLayerContent: options.topLeft.y=" + layerOptions.topLeft.y);
             }
 
             this.needsUpdate = true;

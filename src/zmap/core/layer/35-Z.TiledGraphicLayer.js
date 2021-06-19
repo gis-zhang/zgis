@@ -2,7 +2,7 @@
  * Created by Administrator on 2015/10/30.
  */
 Z.TiledGraphicLayer = Z.ILayer.extend({
-    initialize: function( options){
+    initialize: function(urls, options){
         this.options = {
             idProp: '',
             nameProp: '',
@@ -14,9 +14,12 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
             infoWindowOptions: null,
             enableTip: false,
             enableTitle: false,
-            enableIcon: false
+            enableIcon: false,
+            levelMapping: []
         };
 
+        this.needsUpdate = false;
+        this._urls = urls || [];
         this._graphics = {};
         this._scene = null;
         this._render = null;
@@ -35,23 +38,24 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
             this._render.onRemove(this._scene);
         }
 
-        var newRender = this._getGraphicLayerRender(scene, this.options);
+        var newRender = this._getGraphicLayerRender(scene, this._urls, this.options);
         this._render = newRender;
         this._scene = scene;
         this._containerPane = containerPane;
         var layerIndex = this._render.onAdd(this, this._scene, index, containerPane, groupPane);
 
-        for(var key in this._graphics){
-            if(this._graphics[key]){
-                this._render.addGraphic(this, this._graphics[key]);
+        // for(var key in this._graphics){
+        //     if(this._graphics[key]){
+        //         this._render.addGraphic(this, this._graphics[key]);
 
-                //if(this.options.enableTitle){
-                //    this._graphics[key].showTitle();
-                //}
-            }
-        }
+        //         //if(this.options.enableTitle){
+        //         //    this._graphics[key].showTitle();
+        //         //}
+        //     }
+        // }
 
         this._scene.refresh();
+        this.needsUpdate = true;
         this._applyEvents("on");
         this.fire("load");
 
@@ -60,36 +64,34 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
 
     onRemove: function(scene){
         this._render.onRemove(this._scene);
+        this._removeGraphics(this._graphics);
         //this._scene.refresh();
         this._scene = null;
         this._render = null;
+        this.needsUpdate = true;
         this._applyEvents("off");
     },
 
     show: function(){
         this._render.show();
-
-        //if(this.options.enableTitle){
-        //    for(var key in this._graphics){
-        //        if(this._graphics[key]){
-        //            this._graphics[key].showTitle();
-        //        }
-        //    }
-        //}
+        this.needsUpdate = true;
     },
 
     hide: function(){
         this._render.hide();
+        this.needsUpdate = true;
     },
 
     setOpacity: function(opacity){
         this.options.opacity = opacity;
         this._render.setOpacity(opacity);
+        this.needsUpdate = true;
     },
 
     setZIndex: function(zIndex){
         this.options.zIndex = zIndex;
         this._render.setZIndex(zIndex);
+        this.needsUpdate = true;
     },
 
     getZIndex: function(){
@@ -108,31 +110,12 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
 
     refresh: function(){
         this._render.refresh(this.options);
+        this.needsUpdate = true;
     },
 
-    //addGraphic: function(graphic){
-    //    //this._addOneGraphic(graphic);
-    //    var graphics = graphic instanceof Array ? graphic : [graphic];
-    //    this._addGraphics(graphics);
-    //
-    //    if(this._scene) {
-    //        this._scene.refresh();
-    //    }
-    //},
-    //
-    //addGraphics: function(graphics){
-    //    graphics = graphics instanceof Array ? graphics : [graphics];
-    //
-    //    //for(var i = 0; i < graphics.length; i++){
-    //    //    this._addOneGraphic(graphics[i]);
-    //    //}
-    //
-    //    this._addGraphics(graphics);
-    //
-    //    if(this._scene) {
-    //        this._scene.refresh();
-    //    }
-    //},
+    resetUpdateState: function(){
+        this.needsUpdate = false;
+    },
 
     getGraphics: function(){
         var graphics = [];
@@ -157,84 +140,6 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
             return false;
         }
     },
-
-    //removeGraphic: function(graphic){
-    //    //if(graphic instanceof Z.Graphic) {
-    //    //    var stamp = Z.Util.stamp(graphic, 'graphic');
-    //    //
-    //    //    if(!this._graphics[stamp]){
-    //    //        return;
-    //    //    }
-    //    //
-    //    //    if(this._render){
-    //    //        this._render.removeGraphic(this, graphic);
-    //    //    }
-    //    //
-    //    //    delete this._graphics[stamp];
-    //    //    this._applyGraphicEvents(graphic, 'off');
-    //    //    this._scene.refresh();
-    //    //    this.fire("graphicremove", {graphic: graphic});
-    //    //}
-    //    var graphics = graphic instanceof Array ? graphic : [graphic];
-    //    this._removeGraphics(graphics)
-    //
-    //    if(this._scene) {
-    //        this._scene.refresh();
-    //    }
-    //},
-    //
-    //removeGraphics: function(graphics){
-    //    //if(graphic instanceof Z.Graphic) {
-    //    //    var stamp = Z.Util.stamp(graphic, 'graphic');
-    //    //
-    //    //    if(!this._graphics[stamp]){
-    //    //        return;
-    //    //    }
-    //    //
-    //    //    if(this._render){
-    //    //        this._render.removeGraphic(this, graphic);
-    //    //    }
-    //    //
-    //    //    delete this._graphics[stamp];
-    //    //    this._applyGraphicEvents(graphic, 'off');
-    //    //    this._scene.refresh();
-    //    //    this.fire("graphicremove", {graphic: graphic});
-    //    //}
-    //
-    //    graphics = graphics instanceof Array ? graphics : [graphics];
-    //    this._removeGraphics(graphics);
-    //
-    //    if(this._scene){
-    //        this._scene.refresh();
-    //    }
-    //},
-
-    //clear: function(){
-    //    //this._containerPane.removeChild(this._graphicRoot);
-    //    //this._graphicRoot.resetRoot();
-    //    //this._containerPane.addChild(this._graphicRoot);
-    //    //
-    //    //for(var key in this._graphics){
-    //    //    if(this._graphics[key]){
-    //    //        var gra = this._graphics[key];
-    //    //        this._applyGraphicEvents(gra, 'off');
-    //    //        delete this._graphics[key];
-    //    //        this.fire("graphicremove", {graphic: gra});
-    //    //    }
-    //    //}
-    //    //
-    //    //this._graphics = {};
-    //    //this._scene.refresh();
-    //
-    //    var graphics = [];
-    //
-    //    for(var key in this._graphics){
-    //        graphics.push(this._graphics[key]);
-    //    }
-    //
-    //    this.removeGraphics(graphics);
-    //    this.fire("graphicsclear");
-    //},
 
     latLngToLayerScenePoint: function(latLng){
         if(this._render){
@@ -273,7 +178,7 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
         }
     },
 
-    _getGraphicLayerRender: function(scene, options){
+    _getGraphicLayerRender: function(scene, urls, options){
         var render;
 
         if(!this._pyramidModel){
@@ -283,21 +188,21 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
         options.pyramidModel = this._pyramidModel;
 
         if(scene instanceof Z.Scene2D){
-            render = this._getGraphicLayerRender2D(options);
+            render = this._getGraphicLayerRender2D(urls, options);
         }else if(scene instanceof Z.Scene3D){
-            render = this._getGraphicLayerRender3D(options);
+            render = this._getGraphicLayerRender3D(urls, options);
         }
 
         return render;
     },
 
-    _getGraphicLayerRender2D: function(options){
+    _getGraphicLayerRender2D: function(urls, options){
         return new Z.GraphicLayerRender2D(options);
     },
 
-    _getGraphicLayerRender3D: function(options){
+    _getGraphicLayerRender3D: function(urls, options){
         //return new Z.GraphicLayerRender3D(options);
-        return new Z.VectorTileRender3D(options);
+        return new Z.VectorTileRender3D(urls, options);
     },
 
     _applyEvents: function(onOff){
@@ -382,96 +287,6 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
         }
     },
 
-//    _addGraphics: function(graphics){
-//        var newGraphics = this._checkGraphics(graphics);
-//        var graphicsLength = newGraphics.length;
-//
-//        if(graphicsLength === 0){
-//            return;
-//        }
-//
-//        for(var i = 0; i < graphicsLength; i++) {
-//            var graphic = newGraphics[i];
-//
-//            if(this.options.enableTitle){
-//                graphic.enableTitle();
-//            }
-//
-//            if(this.options.enableIcon){
-//                graphic.enableIcon();
-//            }
-//        }
-////console.info("Z.Graphic:render begin addGraphics");
-//        if(this._render) {
-//            this._render.addGraphics(this, newGraphics);
-//        }
-////console.info("Z.Graphic:begin apply graphic event: " + graphicsLength);
-//        for(var i = 0; i < graphicsLength; i++){
-//            var graphic = newGraphics[i];
-//
-//            //if(this.options.enableTitle){
-//            //    graphic.enableTitle();
-//            //}
-//            //
-//            //if(this.options.enableIcon){
-//            //    graphic.enableIcon();
-//            //}
-//
-//            var stamp = Z.Util.stamp(graphic, 'graphic');
-//            this._graphics[stamp] = graphic;
-//
-//            this._applyGraphicEvents(graphic, 'on');
-//
-//            this.fire("graphicadd", {graphic: graphic});
-//            //console.info("fire graphicadd event:" + i);
-//        }
-//        //console.info("Z.Graphic:apply graphic event end");
-//    },
-//
-//    _removeGraphics: function(graphics){
-//        var newGraphics = this._checkGraphics(graphics, "exist");
-//        var graphicsLength = newGraphics.length;
-//
-//        if(graphicsLength === 0){
-//            return;
-//        }
-//
-//        if(this._render) {
-//            this._render.removeGraphics(this, newGraphics);
-//        }
-//
-//        for(var i = 0; i < graphicsLength; i++){
-//            var graphic = newGraphics[i];
-//            var stamp = Z.Util.stamp(graphic, 'graphic');
-//
-//            delete this._graphics[stamp];
-//            this._applyGraphicEvents(graphic, 'off');
-//            this.fire("graphicremove", {graphic: graphic});
-//        }
-//    },
-
-    //_checkGraphics: function(graphics, type){      //type: "exist" | "new"
-    //    var newGraphics = [],
-    //        graphicsLength = graphics.length,
-    //        type = type || "new";
-    //
-    //    for(var i = 0; i < graphicsLength; i++) {
-    //        var graphic = graphics[i];
-    //
-    //        if (graphic instanceof Z.Graphic || graphic instanceof Z.ComposeGraphic1) {
-    //            var stamp = Z.Util.stamp(graphic, 'graphic');
-    //
-    //            if (!this._graphics[stamp] && type === "new") {
-    //                newGraphics.push(graphic);
-    //            }else if(this._graphics[stamp] && type === "exist"){
-    //                newGraphics.push(graphic);
-    //            }
-    //        }
-    //    }
-    //
-    //    return newGraphics;
-    //},
-
     _enableInfoWindowEvent: function(onOff){
         this[onOff]("graphicclick", this._showGraphicInfoWindow, this);
     },
@@ -512,13 +327,17 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
     },
 
     _onTileLoad: function(e){
+        this.needsUpdate = true;
         var graphics = e.graphics;
         this._addGraphics(graphics);
     },
 
-    _onTileUpdate: function(e){},
+    _onTileUpdate: function(e){
+        this.needsUpdate = true;
+    },
 
     _onTileRemove: function(e){
+        this.needsUpdate = true;
         var graphics = e.graphics;
         this._removeGraphics(graphics);
     },
@@ -598,29 +417,6 @@ Z.TiledGraphicLayer = Z.ILayer.extend({
     },
 
     _initPyramidModel: function(options){
-        //var pyramidOptions = {
-        //    //latLngBounds: this._latLngBounds.clone(),
-        //    origin: options.tileInfo.origin,
-        //    tileSize: Z.Point.create(options.tileInfo.tileWidth, options.tileInfo.tileHeight),
-        //    levelDefine: options.tileInfo.levelDefine
-        //};
-
-        //if(this._scene){
-        //    pyramidOptions.crs = this._scene.options.crs;
-        //}
-        //pyramidOptions.crs = Z.CRS[options.crs] || (this._scene ? this._scene.options.crs : null) || Z.CRS[ZMapConfig.crs];
-        //var pyramidOptions = {
-        //    //latLngBounds: this._latLngBounds.clone(),
-        //    //origin: options.tileInfo.origin,
-        //    //tileSize: Z.Point.create(options.tileInfo.tileWidth, options.tileInfo.tileHeight),
-        //    //levelDefine: options.tileInfo.levelDefine
-        //};
-        //pyramidOptions.crs = Z.CRS["EPSG3857"];
-        //
-        //////this._pyramidModel = new Z.PyramidModel(pyramidOptions);
-        ////this._pyramidModel = new Z.CustomPyramidModel(pyramidOptions);
-        //return Z.PyramidModelFactory.create(pyramidOptions);
-
         return new Z.PyramidModel.OSM();
     }
 });

@@ -19,7 +19,8 @@ Z.FixedMultiplePyramidGrid = Z.AbstractPyramidGrid.extend({
         //var defaultBaseScale = this._dpi * Math.abs(this._crs.latLngToMeterPoint(this._origin).x) * 2 / (0.0254 * this._tileSize.x);
         //var defaultBaseScale = this._dpi * Math.abs(this._origin).x * 2 / (0.0254 * this._tileSize.x);
         //var defaultBaseScale = this._dpi * Math.abs(this._origin.lng) * 2 / (0.0254 * this._tileSize.x);
-        //this.baseScale = options.baseScale || defaultBaseScale;
+        // var defaultBaseScale = this.baseResolution * this._dpi / 0.0254;
+        // this.baseScale = options.baseScale || defaultBaseScale;
         this.baseScale = options.baseScale || 1;
     },
 

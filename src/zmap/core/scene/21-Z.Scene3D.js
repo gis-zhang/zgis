@@ -781,7 +781,7 @@ Z.Scene3D = Z.IScene.extend({
             objects.push(intersectObjs[i].graphic);
         }
         //console.info(type + "| latlng:" + latlng.lat + "," + latlng.lng + "| scenePoint:" + scenePoint.x + "," + scenePoint.y + "," + scenePoint.z + "| containerPoint:" + containerPoint.x + "," + containerPoint.y);
-        console.info(type + "(" + intersectObjs.length + ") | containerPoint:" + containerPoint.x + "," + containerPoint.y + " | objects.length=" + objects.length);
+        //console.info(type + "(" + intersectObjs.length + ") | containerPoint:" + containerPoint.x + "," + containerPoint.y + " | objects.length=" + objects.length);
         this.fire(type, {
             latlng: latlng,
             scenePoint: scenePoint,
