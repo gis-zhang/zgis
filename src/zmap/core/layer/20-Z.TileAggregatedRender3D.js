@@ -150,33 +150,9 @@ Z.TileAggregatedRender3D = Z.ITileRender.extend({
         //this._setTileZIndex(zIndex, this._containerPane.index);
     },
 
-    //_setTileZIndex: function(zIndex, containerPaneIndex){
-    //    for (var key in this._tiles) {
-    //        //this._tiles[key].renderOrder = this._containerPane.index * Z.Globe.Layer.layerGroupSize + zIndex;
-    //        Z.ZIndexManager.setZIndex(this._tiles[key], zIndex, containerPaneIndex);
-    //    }
-    //},
-
     refresh: function(tileOptions){
 
     },
-
-    //_initPyramidModel: function(options){
-    //    var pyramidOptions = {
-    //        //latLngBounds: this._latLngBounds.clone(),
-    //        origin: options.tileInfo.origin,
-    //        tileSize: Z.Point.create(options.tileInfo.tileWidth, options.tileInfo.tileHeight),
-    //        levelDefine: options.tileInfo.levelDefine
-    //    };
-    //
-    //    if(this._scene){
-    //        pyramidOptions.crs = this._scene.options.crs;
-    //    }
-    //
-    //    ////this._pyramidModel = new Z.PyramidModel(pyramidOptions);
-    //    //this._pyramidModel = new Z.CustomPyramidModel(pyramidOptions);
-    //    this._pyramidModel = Z.PyramidModelFactory.create(pyramidOptions);
-    //},
 
     _addEvents: function(){
         var thisObj = this;
@@ -247,7 +223,7 @@ Z.TileAggregatedRender3D = Z.ITileRender.extend({
         var latLngContentBounds = this._scene.getContentBounds(),
             latLngOrthoBounds = this._scene.getBounds(),
             size = this._scene.getSize(),
-            sceneScale = this._scene.getScale(),
+            // sceneScale = this._scene.getScale(),
             fitLevel = this._pyramidModel.fitZoomLevel(latLngOrthoBounds, size.x, size.y);
 
         var tileBounds = null;

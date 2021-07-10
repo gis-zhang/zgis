@@ -7,7 +7,7 @@ Z.GraphicLayerRender3D = Z.IGraphicLayerRender.extend({
         this.options = Z.Util.applyOptions(this.options, options, false);
 
         this._graphicRoot = new Z.SceneThreePaneItem();
-        this._rootLatLng = null;     //图层根对象（threejs的Geometry3D对象）的中心点对应的空间坐标
+        //this._rootLatLng = null;     //图层根对象（threejs的Geometry3D对象）的中心点对应的空间坐标
         this._containerPane = null;
         this._anchor = {
             latLng1: null,     //锚点，作为graphic场景坐标计算的基准，所有graphic的空间坐标转为场景坐标时，均相对于此锚点进行
@@ -275,9 +275,9 @@ Z.GraphicLayerRender3D = Z.IGraphicLayerRender.extend({
         this._scene[onOff]("viewreset", thisObj._onViewReset, thisObj);
         this._scene[onOff]("moveend", thisObj._onMoveEnd, thisObj);
         this._scene[onOff]("zoomlevelschange", thisObj._onZoomLevelsChange, thisObj);
-        this._scene[onOff]("dragstart", thisObj._onDragStart, thisObj);
-        this._scene[onOff]("drag", this._onDrag, thisObj);
-        this._scene[onOff]("dragend", thisObj._onDragEnd, thisObj);
+        // this._scene[onOff]("dragstart", thisObj._onDragStart, thisObj);
+        // this._scene[onOff]("drag", this._onDrag, thisObj);
+        // this._scene[onOff]("dragend", thisObj._onDragEnd, thisObj);
 
         var domEvents = ['dblclick', 'click', 'mousedown', 'mouseup', 'mouseover',
                 'mouseout', 'mousemove', 'contextmenu'],
@@ -335,46 +335,46 @@ Z.GraphicLayerRender3D = Z.IGraphicLayerRender.extend({
         this._refreshGraphics();
     },
 
-    _onDragStart: function(e){
-        this._dragStartPoint = this._graphicRoot.root.position.clone();
-    },
+    // _onDragStart: function(e){
+    //     this._dragStartPoint = this._graphicRoot.root.position.clone();
+    // },
 
-    _onDrag: function(e){
-        var sceneObj = this._scene;
+    // _onDrag: function(e){
+    //     var sceneObj = this._scene;
 
-        if(!e.startPoint || !e.newPoint){
-            return;
-        }
+    //     if(!e.startPoint || !e.newPoint){
+    //         return;
+    //     }
 
-        var startPoint = sceneObj.screenPointToScenePoint(e.startPoint);
-        var newPoint = sceneObj.screenPointToScenePoint(e.newPoint);
+    //     var startPoint = sceneObj.screenPointToScenePoint(e.startPoint);
+    //     var newPoint = sceneObj.screenPointToScenePoint(e.newPoint);
 
-        if(!startPoint || !newPoint){
-            return;
-        }
+    //     if(!startPoint || !newPoint){
+    //         return;
+    //     }
 
-        var delta = newPoint.subtract(startPoint),
-            x = this._dragStartPoint.x + delta.x,
-            y = this._dragStartPoint.y + delta.y,
-            z = this._dragStartPoint.z + delta.z;
+    //     var delta = newPoint.subtract(startPoint),
+    //         x = this._dragStartPoint.x + delta.x,
+    //         y = this._dragStartPoint.y + delta.y,
+    //         z = this._dragStartPoint.z + delta.z;
 
-        this._graphicRoot.root.position.set(x, y, z);
-        this._graphicRoot.root.position.matrixWorldNeedsUpdate = true;
-        this._scene.refresh();
-        this._refreshGraphics();
-    },
+    //     this._graphicRoot.root.position.set(x, y, z);
+    //     this._graphicRoot.root.position.matrixWorldNeedsUpdate = true;
+    //     this._scene.refresh();
+    //     this._refreshGraphics();
+    // },
 
-    _onDragEnd: function(e){
-        //var sceneObj = this._scene;
-        //var startPoint = sceneObj.screenPointToScenePoint(e.startPoint);
-        //var newPoint = sceneObj.screenPointToScenePoint(e.newPoint);
-        ////var delta = newPoint.subtract(startPoint);
-        //this._graphicRoot.root.position.x = this._dragStartPoint.x;
-        //this._graphicRoot.root.position.y = this._dragStartPoint.y;
-        //this._graphicRoot.root.position.z = this._dragStartPoint.z;
+    // _onDragEnd: function(e){
+    //     //var sceneObj = this._scene;
+    //     //var startPoint = sceneObj.screenPointToScenePoint(e.startPoint);
+    //     //var newPoint = sceneObj.screenPointToScenePoint(e.newPoint);
+    //     ////var delta = newPoint.subtract(startPoint);
+    //     //this._graphicRoot.root.position.x = this._dragStartPoint.x;
+    //     //this._graphicRoot.root.position.y = this._dragStartPoint.y;
+    //     //this._graphicRoot.root.position.z = this._dragStartPoint.z;
 
-        this._dragStartPoint =null;
-    },
+    //     this._dragStartPoint =null;
+    // },
 
     _onMouseEvent: function(e){
         var objs = e.objects || [], objectArray = [], objectSet = {}, stamp;
@@ -564,26 +564,26 @@ Z.GraphicLayerRender3D = Z.IGraphicLayerRender.extend({
             sceneHeight: sceneHeight
         };
 
-        this._initRootLatLng();
+        // this._initRootLatLng();
     },
 
-    _refreshAnchor: function(){
-        var sceneBounds = this._scene.getBounds();
+    // _refreshAnchor: function(){
+    //     var sceneBounds = this._scene.getBounds();
 
-        this._anchor.scenePoint1 = this._scene.latLngToScenePoint(this._anchor.latLng1);
-        this._anchor.scenePoint2 = this._scene.latLngToScenePoint(this._anchor.latLng2);
-    },
+    //     this._anchor.scenePoint1 = this._scene.latLngToScenePoint(this._anchor.latLng1);
+    //     this._anchor.scenePoint2 = this._scene.latLngToScenePoint(this._anchor.latLng2);
+    // },
 
-    _initRootLatLng: function(){
-        var rootPos = this._graphicRoot.root.position;
-        this._rootLatLng = this._scene.scenePointToLatLng(new Z.Point(rootPos.x, rootPos.y, rootPos.z));
-    },
+    // _initRootLatLng: function(){
+    //     var rootPos = this._graphicRoot.root.position;
+    //     this._rootLatLng = this._scene.scenePointToLatLng(new Z.Point(rootPos.x, rootPos.y, rootPos.z));
+    // },
 
-    _repositionRoot: function(){
-        var rootPos = this._scene.latLngToScenePoint(this._rootLatLng);
-        this._graphicRoot.root.position.set(rootPos.x, rootPos.y, rootPos.z);
-        this._graphicRoot.root.position.matrixWorldNeedsUpdate = true;
-        this._graphicRoot.root.updateMatrix();
-        this._graphicRoot.root.updateMatrixWorld(true);
-    }
+    // _repositionRoot: function(){
+    //     var rootPos = this._scene.latLngToScenePoint(this._rootLatLng);
+    //     this._graphicRoot.root.position.set(rootPos.x, rootPos.y, rootPos.z);
+    //     this._graphicRoot.root.position.matrixWorldNeedsUpdate = true;
+    //     this._graphicRoot.root.updateMatrix();
+    //     this._graphicRoot.root.updateMatrixWorld(true);
+    // }
 });

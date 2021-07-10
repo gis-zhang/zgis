@@ -74946,33 +74946,9 @@ Z.TileAggregatedRender3D = Z.ITileRender.extend({
         //this._setTileZIndex(zIndex, this._containerPane.index);
     },
 
-    //_setTileZIndex: function(zIndex, containerPaneIndex){
-    //    for (var key in this._tiles) {
-    //        //this._tiles[key].renderOrder = this._containerPane.index * Z.Globe.Layer.layerGroupSize + zIndex;
-    //        Z.ZIndexManager.setZIndex(this._tiles[key], zIndex, containerPaneIndex);
-    //    }
-    //},
-
     refresh: function(tileOptions){
 
     },
-
-    //_initPyramidModel: function(options){
-    //    var pyramidOptions = {
-    //        //latLngBounds: this._latLngBounds.clone(),
-    //        origin: options.tileInfo.origin,
-    //        tileSize: Z.Point.create(options.tileInfo.tileWidth, options.tileInfo.tileHeight),
-    //        levelDefine: options.tileInfo.levelDefine
-    //    };
-    //
-    //    if(this._scene){
-    //        pyramidOptions.crs = this._scene.options.crs;
-    //    }
-    //
-    //    ////this._pyramidModel = new Z.PyramidModel(pyramidOptions);
-    //    //this._pyramidModel = new Z.CustomPyramidModel(pyramidOptions);
-    //    this._pyramidModel = Z.PyramidModelFactory.create(pyramidOptions);
-    //},
 
     _addEvents: function(){
         var thisObj = this;
@@ -75043,7 +75019,7 @@ Z.TileAggregatedRender3D = Z.ITileRender.extend({
         var latLngContentBounds = this._scene.getContentBounds(),
             latLngOrthoBounds = this._scene.getBounds(),
             size = this._scene.getSize(),
-            sceneScale = this._scene.getScale(),
+            // sceneScale = this._scene.getScale(),
             fitLevel = this._pyramidModel.fitZoomLevel(latLngOrthoBounds, size.x, size.y);
 
         var tileBounds = null;
@@ -78288,7 +78264,7 @@ Z.GraphicLayerRender3D = Z.IGraphicLayerRender.extend({
         this.options = Z.Util.applyOptions(this.options, options, false);
 
         this._graphicRoot = new Z.SceneThreePaneItem();
-        this._rootLatLng = null;     //图层根对象（threejs的Geometry3D对象）的中心点对应的空间坐标
+        //this._rootLatLng = null;     //图层根对象（threejs的Geometry3D对象）的中心点对应的空间坐标
         this._containerPane = null;
         this._anchor = {
             latLng1: null,     //锚点，作为graphic场景坐标计算的基准，所有graphic的空间坐标转为场景坐标时，均相对于此锚点进行
@@ -78556,9 +78532,9 @@ Z.GraphicLayerRender3D = Z.IGraphicLayerRender.extend({
         this._scene[onOff]("viewreset", thisObj._onViewReset, thisObj);
         this._scene[onOff]("moveend", thisObj._onMoveEnd, thisObj);
         this._scene[onOff]("zoomlevelschange", thisObj._onZoomLevelsChange, thisObj);
-        this._scene[onOff]("dragstart", thisObj._onDragStart, thisObj);
-        this._scene[onOff]("drag", this._onDrag, thisObj);
-        this._scene[onOff]("dragend", thisObj._onDragEnd, thisObj);
+        // this._scene[onOff]("dragstart", thisObj._onDragStart, thisObj);
+        // this._scene[onOff]("drag", this._onDrag, thisObj);
+        // this._scene[onOff]("dragend", thisObj._onDragEnd, thisObj);
 
         var domEvents = ['dblclick', 'click', 'mousedown', 'mouseup', 'mouseover',
                 'mouseout', 'mousemove', 'contextmenu'],
@@ -78845,28 +78821,28 @@ Z.GraphicLayerRender3D = Z.IGraphicLayerRender.extend({
             sceneHeight: sceneHeight
         };
 
-        this._initRootLatLng();
+        // this._initRootLatLng();
     },
 
-    _refreshAnchor: function(){
-        var sceneBounds = this._scene.getBounds();
+    // _refreshAnchor: function(){
+    //     var sceneBounds = this._scene.getBounds();
 
-        this._anchor.scenePoint1 = this._scene.latLngToScenePoint(this._anchor.latLng1);
-        this._anchor.scenePoint2 = this._scene.latLngToScenePoint(this._anchor.latLng2);
-    },
+    //     this._anchor.scenePoint1 = this._scene.latLngToScenePoint(this._anchor.latLng1);
+    //     this._anchor.scenePoint2 = this._scene.latLngToScenePoint(this._anchor.latLng2);
+    // },
 
-    _initRootLatLng: function(){
-        var rootPos = this._graphicRoot.root.position;
-        this._rootLatLng = this._scene.scenePointToLatLng(new Z.Point(rootPos.x, rootPos.y, rootPos.z));
-    },
+    // _initRootLatLng: function(){
+    //     var rootPos = this._graphicRoot.root.position;
+    //     this._rootLatLng = this._scene.scenePointToLatLng(new Z.Point(rootPos.x, rootPos.y, rootPos.z));
+    // },
 
-    _repositionRoot: function(){
-        var rootPos = this._scene.latLngToScenePoint(this._rootLatLng);
-        this._graphicRoot.root.position.set(rootPos.x, rootPos.y, rootPos.z);
-        this._graphicRoot.root.position.matrixWorldNeedsUpdate = true;
-        this._graphicRoot.root.updateMatrix();
-        this._graphicRoot.root.updateMatrixWorld(true);
-    }
+    // _repositionRoot: function(){
+    //     var rootPos = this._scene.latLngToScenePoint(this._rootLatLng);
+    //     this._graphicRoot.root.position.set(rootPos.x, rootPos.y, rootPos.z);
+    //     this._graphicRoot.root.position.matrixWorldNeedsUpdate = true;
+    //     this._graphicRoot.root.updateMatrix();
+    //     this._graphicRoot.root.updateMatrixWorld(true);
+    // }
 });
 /**
  * Created by Administrator on 2015/10/31.
@@ -80648,9 +80624,9 @@ Z.SurfacePlane = Z.Class.extend({
         var thisObj = this;
         this._scene[onOff]("viewreset", thisObj._onViewReset, thisObj);
         this._scene[onOff]("zoomlevelschange", thisObj._onZoomChange, thisObj);
-        this._scene[onOff]("dragstart", thisObj._onDragStart, thisObj);
-        this._scene[onOff]("drag", this._onDrag, thisObj);
-        this._scene[onOff]("dragend", thisObj._onDragEnd, thisObj);
+        // this._scene[onOff]("dragstart", thisObj._onDragStart, thisObj);
+        // this._scene[onOff]("drag", this._onDrag, thisObj);
+        // this._scene[onOff]("dragend", thisObj._onDragEnd, thisObj);
     },
 
     _onViewReset: function(e){
@@ -80745,8 +80721,8 @@ Z.SurfacePlane = Z.Class.extend({
     _getRenderTileSize: function(tilePoint){
         //var tileLatLngBounds = this._pyramidModel.getLatLngBounds(tilePoint, this._scene.getZoom()),
         var tileLatLngBounds = this._pyramidModel.getLatLngBounds(tilePoint, tilePoint.z),
-            southWest = this._scene._latLngToGLPoint(tileLatLngBounds.getSouthWest()),
-            northEast = this._scene._latLngToGLPoint(tileLatLngBounds.getNorthEast());
+            southWest = this._scene.latLngToScenePoint(tileLatLngBounds.getSouthWest()),
+            northEast = this._scene.latLngToScenePoint(tileLatLngBounds.getNorthEast());
 
         return new Z.Point(Math.abs(southWest.x - northEast.x), Math.abs(southWest.y - northEast.y));
     },
@@ -80767,7 +80743,7 @@ Z.SurfacePlane = Z.Class.extend({
             south = tileLatLngBounds_max.getSouth(),
             east = tileLatLngBounds_max.getEast();
 
-        return this._scene._latLngToGLPoint(new Z.LatLng((south + north)/2, (east + west)/2));
+        return this._scene.latLngToScenePoint(new Z.LatLng((south + north)/2, (east + west)/2));
     },
 
     _updateTileTexture: function(texture, tileBounds, level){
@@ -81116,7 +81092,7 @@ Z.SceneRender3D = function(container, options){
     this._sceneObject = null;
     this._renderObject = null;
     this._xyPlane = null;            //xy平面（z=0），用于计算地面中哪些部分显示在视域中
-    //this._viewCenter = new THREE.Vector3(0, 0, 0);
+    this._viewCenter = new THREE.Vector3(0, 0, 0);     //场景中心点
 
     this._updateChecker = [];
     this._removedUpdateChecker = [];
@@ -81141,7 +81117,7 @@ Z.SceneRender3D = function(container, options){
         cameraFar: 150,   //相机远面
         cameraPosition: {x: 0, y: 0, z:50},
         cameraRotation:{x:0, y: 0, z: 0},
-        cameraTarget:{x:0, y: 0, z: 0},
+        //cameraTarget:{x:0, y: 0, z: 0},
         showFrameRate: false
     };
 
@@ -81253,17 +81229,6 @@ Z.SceneRender3D.prototype = {
         }catch(e){
             console.error(e.message);
         }
-
-        //var thisObj = this;
-        //function _render(){
-        //    Z.RenderMonitor.update();
-        //    Z.ImageTextureManager.loadTextures();
-        //    Z.TileManager.loadImages();
-        //    Z.SingleTerrainPlane.getInstance().refresh();
-        //    thisObj._renderObject.clear();
-        //    thisObj._renderObject.render(thisObj._sceneObject, thisObj._cameraObject);
-        //    requestAnimationFrame(_render);
-        //}
     },
 
     _runRenderLoop: function(){
@@ -81369,8 +81334,31 @@ Z.SceneRender3D.prototype = {
         return Z.Point.create(this.options.width, this.options.height);
     },
 
+    setViewCenter: function(glCenter){
+        if(!glCenter || (!(glCenter instanceof THREE.Vector3) && !(glCenter instanceof Z.Point))){
+            return;
+        }
+
+        var pt = glCenter;
+
+        if(glCenter instanceof Z.Point){
+            pt = new THREE.Vector3(glCenter.x, glCenter.y, glCenter.z);
+        }
+
+        var offset = pt.clone().sub(this._viewCenter);
+        this._cameraObject.position.add(offset);
+        this._cameraObject.updateMatrix();
+        this._cameraObject.updateMatrixWorld(true);
+        console.info("Z.SceneRender3D.setViewCenter:camera position:(" + this._cameraObject.position.x + ", " + this._cameraObject.position.y + ", " + this._cameraObject.position.z + ")");
+
+        this._viewCenter.x = pt.x;
+        this._viewCenter.y = pt.y;
+        this._viewCenter.z = pt.z;
+    },
+
     resetCamera: function(){
         this._cameraObject = this._rawCameraObject.clone();
+        this._viewCenter.set(0, 0, 0);
         this._cameraObject.updateMatrixWorld();
     },
 
@@ -81386,7 +81374,8 @@ Z.SceneRender3D.prototype = {
             this._cameraObject.position.applyMatrix4(matrix);
             this._cameraObject.up.applyQuaternion(quaternion);
             //this._radRotation.set(rotate.x, rotate.y, rotate.z);
-            this._cameraObject.lookAt(new THREE.Vector3(this.options.cameraTarget.x, this.options.cameraTarget.y, this.options.cameraTarget.z));
+            //this._cameraObject.lookAt(new THREE.Vector3(this.options.cameraTarget.x, this.options.cameraTarget.y, this.options.cameraTarget.z));
+            this._cameraObject.lookAt(this._viewCenter.clone());
             //alert("rotation:" + this._cameraObject.rotation.x * 180 / Math.PI + "," + this._cameraObject.rotation.y * 180 / Math.PI + "," + this._cameraObject.rotation.z * 180 / Math.PI
             //    + ";up:" + this._cameraObject.up.x + "," + this._cameraObject.up.y + "," + this._cameraObject.up.z);
             this._cameraObject.updateMatrix();
@@ -81560,14 +81549,20 @@ Z.SceneRender3D.prototype = {
 
     /*垂直俯视且无z轴旋转情况下在z=0平面上的正射范围（世界坐标）*/
     getOrthoGLBounds: function(){
-        var distance = new THREE.Vector3(this.options.cameraPosition.x,
-            this.options.cameraPosition.y,
-            this.options.cameraPosition.z).length();
+        // var distance = new THREE.Vector3(this.options.cameraPosition.x,
+        //     this.options.cameraPosition.y,
+        //     this.options.cameraPosition.z).length();
+        var centerPoint = this._viewCenter;
+        //var distance = this._cameraObject.position.clone().sub(centerPoint).length();
+        var distance = this._cameraObject.position.distanceTo(centerPoint);
 
         var halfHeight = distance * Math.tan(Math.PI * this._cameraObject.fov / (2 * 180));
         var halfWidth = halfHeight * this.options.width / this.options.height;
-        var topLeft = new Z.Point(this.options.cameraPosition.x - halfWidth, this.options.cameraPosition.y + halfHeight);
-        var bottomRight = new Z.Point(this.options.cameraPosition.x + halfWidth, this.options.cameraPosition.y - halfHeight);
+        // var topLeft = new Z.Point(this.options.cameraPosition.x - halfWidth, this.options.cameraPosition.y + halfHeight);
+        // var bottomRight = new Z.Point(this.options.cameraPosition.x + halfWidth, this.options.cameraPosition.y - halfHeight);
+        
+        var topLeft = new Z.Point(centerPoint.x - halfWidth, centerPoint.y + halfHeight);
+        var bottomRight = new Z.Point(centerPoint.x + halfWidth, centerPoint.y - halfHeight);
 
         return Z.GLBounds.create(topLeft, bottomRight);
     },
@@ -81575,7 +81570,8 @@ Z.SceneRender3D.prototype = {
     /*当前z=0平面的可视范围（世界坐标）*/
     getVisibleGLBounds: function(){
         var raycaster = new THREE.Raycaster();
-
+        console.info("Z.SceneRender3D.getVisibleGLBounds:_cameraObject.position: x=" + this._cameraObject.position.x + ", y=" + this._cameraObject.position.y 
+            + ", z=" + this._cameraObject.position.z);
         //_getIntersectPoint: function(raycaster, targetGeometry, viewPoint, camera){
         var leftUp = this._getIntersectPoint(raycaster, this._xyPlane, new THREE.Vector2(-1, 1), this._cameraObject);
         var leftBottom = this._getIntersectPoint(raycaster, this._xyPlane, new THREE.Vector2(-1, -1), this._cameraObject);
@@ -81725,9 +81721,11 @@ Z.SceneRender3D.prototype = {
         }
 
         var radius = new THREE.Vector3(glBounds.max.x - glBounds.min.x, glBounds.max.y - glBounds.min.y, glBounds.max.z - glBounds.min.z).length() / 2,
-            cameraDistance = new THREE.Vector3(this.options.cameraPosition.x,
-                this.options.cameraPosition.y,
-                this.options.cameraPosition.z).length();
+            // cameraDistance = new THREE.Vector3(this.options.cameraPosition.x,
+            //     this.options.cameraPosition.y,
+            //     this.options.cameraPosition.z).length();
+            //cameraDistance = this._cameraObject.position.sub(this._viewCenter).length();
+            cameraDistance = this._cameraObject.distanceTo(this._viewCenter);
 
         var minVerticalDistance = cameraDistance * Math.sin(Math.PI * this._cameraObject.fov / (2 * 180)),
             cameraWidth = this._cameraObject.aspect * cameraDistance * Math.tan(Math.PI * this._cameraObject.fov / (2 * 180)),
@@ -81742,7 +81740,8 @@ Z.SceneRender3D.prototype = {
         this._cameraObject.position.x = this.options.cameraPosition.x;
         this._cameraObject.position.y = this.options.cameraPosition.y;
         this._cameraObject.position.z = this.options.cameraPosition.z;
-        this._cameraObject.lookAt(new THREE.Vector3(this.options.cameraTarget.x, this.options.cameraTarget.y, this.options.cameraTarget.z));
+        //this._cameraObject.lookAt(new THREE.Vector3(this.options.cameraTarget.x, this.options.cameraTarget.y, this.options.cameraTarget.z));
+        this._cameraObject.lookAt(this._viewCenter.clone());
         this._cameraObject.updateMatrixWorld();
         this._rawCameraObject = this._cameraObject.clone();
     },
@@ -81791,8 +81790,8 @@ Z.SceneRender3D.prototype = {
     _createXYPlane: function(cameraFov, cameraHeight, WHRatio){
         var halfHeight = cameraHeight * Math.tan(Math.PI * cameraFov/(2 * 180));
         var edgeLength = cameraHeight / Math.cos(Math.PI * cameraFov/(2 * 180));
-        var height = Math.max(halfHeight * 2, edgeLength) * 2;    //适度放大，确保平面大于视域范围
-        var width = height * WHRatio;
+        var height = Math.max(halfHeight * 2, edgeLength) * 100000000;    //适度放大，确保平面大于视域范围
+        var width = height * WHRatio * 100000000;
         var plane = new THREE.PlaneGeometry(width, height);
         var meterial = new THREE.MeshBasicMaterial({color:'#ffffff'});//var meterial = new THREE.MeshBasicMaterial({color:'#888800'});
         meterial.polygonOffset = true;
@@ -81852,6 +81851,9 @@ Z.SceneRender3D.prototype = {
             worldVertex = [],
             vector,
             vertexLength = viewPortVertex.length;
+
+        // camera.updateMatrix();
+        // camera.updateMatrixWorld();
 
         for(var i = 0; i < vertexLength; i++){
             vector = new THREE.Vector3(viewPortVertex[i][0], viewPortVertex[i][1], viewPortVertex[i][2]);
@@ -82561,29 +82563,10 @@ Z.Scene3D = Z.IScene.extend({
     },
 
     getContentBounds: function(){
-        //var renderOrthoBounds = this._sceneRender.getOrthoGLBounds();
-        //var renderContentBounds = this._sceneRender.getVisibleGLBounds();
-        //var widthRatio = (this._latLngBounds.getEast() - this._latLngBounds.getWest()) / renderOrthoBounds.getWidth();
-        //var heightRatio = (this._latLngBounds.getNorth() - this._latLngBounds.getSouth()) / renderOrthoBounds.getHeight();
-        //var latLngWidth = renderContentBounds.getWidth() * widthRatio;
-        //var latLngHeight = renderContentBounds.getHeight() * heightRatio;
-        //var west = this._latLngCenter.lng - latLngWidth * (renderOrthoBounds.getCenter().x - renderContentBounds.getBottomLeft().x) / renderContentBounds.getWidth();
-        //var east = west + latLngWidth;
-        //var north = this._latLngCenter.lat + latLngHeight * (renderContentBounds.getTopRight().y - renderOrthoBounds.getCenter().y) / renderContentBounds.getHeight();
-        //var south = north - latLngHeight;
-        //
-        //return new Z.LatLngBounds.create(new Z.LatLng(south, west), new Z.LatLng(north, east));
         return this._viewableLatLngBounds.clone();
     },
 
-    //getContentGLBounds: function(){
-    //    return this._sceneRender.getVisibleGLBounds().clone();
-    //},
-
     getPixelSceneRatio: function(){
-        //var renderOrthoBounds = this._sceneRender.getOrthoGLBounds();
-        //var widthRatio = this._container.clientWidth / renderOrthoBounds.getWidth();
-        //var heightRatio = this._container.clientHeight / renderOrthoBounds.getHeight();
         var renderOrthoBounds = this._orthoGLBounds;
         var widthRatio = this._containerWidth / renderOrthoBounds.getWidth();
         var heightRatio = this._containerHeight / renderOrthoBounds.getHeight();
@@ -82694,14 +82677,6 @@ Z.Scene3D = Z.IScene.extend({
         control.onRemove(this);
     },
 
-    //setRotationByEuler: function(rotate){
-    //    if(rotate){
-    //        this._sceneRender.setRotationByEuler(rotate);
-    //        this._sceneRender.render();
-    //        this._rotation = rotate;
-    //    }
-    //},
-
     setSunLightPosition: function(sunLightPosition){
         if(sunLightPosition){
             this._sceneRender.setLightPosition(sunLightPosition);
@@ -82742,9 +82717,7 @@ Z.Scene3D = Z.IScene.extend({
     },
 
     refresh: function(){
-        //console.info("refresh");
         this.refreshPopup();
-        //console.info("brfore this._sceneRender.render()");
         this._sceneRender.needsUpdate = true;
         this._sceneRender.render();
     },
@@ -82763,12 +82736,6 @@ Z.Scene3D = Z.IScene.extend({
         this._containerWidth = newWidth;
         this._containerHeight = newHeight;
 
-        //if(Math.abs(oldWidth - this._containerWidth) < tolerance && Math.abs(oldHeight - this._containerHeight) < tolerance){
-        //    return;
-        //}
-
-        //this._containerLeft = this._container.offsetLeft;
-        //this._containerTop = this._container.offsetTop;
         var offsetPoint = Z.DomUtil.getOffsetPoint(this._container) || {};
         this._containerLeft = offsetPoint.left || 0;
         this._containerTop = offsetPoint.top || 0;
@@ -82776,8 +82743,6 @@ Z.Scene3D = Z.IScene.extend({
         this._viewFrame.resize();
         this._sceneRender.render();
 
-        //this._latLngBounds
-        //var newLatLngBounds = this._projBounds2LatLngBounds(newProjBounds, this._projModel);
         var latLngWidth = this._latLngBounds.getEast() - this._latLngBounds.getWest();
 
         if(Math.abs(oldWidth) > tolerance){
@@ -82878,7 +82843,6 @@ Z.Scene3D = Z.IScene.extend({
     _initSurfacePlane: function(){
         this._terrainPlane = Z.SingleTerrainPlane.getInstance();
         this._terrainPlane.enablePolygonOffset();
-        //this._terrainPlane.onAdd(this, this._pyramidModel, this._contentFrame.rootPane.root);
         this._terrainPlane.onAdd(this, this._pyramidModel, this._layerRoot.root);
     },
 
@@ -82888,18 +82852,6 @@ Z.Scene3D = Z.IScene.extend({
             this._terrainPlane = null;
         }
     },
-
-    //_initPyramidModel: function(options){
-    //    var pyramidOptions = {
-    //        //latLngBounds: this._latLngBounds.clone(),
-    //        levelDefine: options.levelDefine,
-    //        crs: options.crs
-    //    };
-    //
-    //    //this._pyramidModel = new Z.PyramidModel(pyramidOptions);
-    //    //this._pyramidModel = new Z.CustomPyramidModel(pyramidOptions);
-    //    this._pyramidModel = Z.PyramidModelFactory.create(pyramidOptions);
-    //},
 
     _initEvents: function(onOff){
         if (!Z.DomEvent) { return; }
@@ -82933,22 +82885,7 @@ Z.Scene3D = Z.IScene.extend({
         var delta = Z.DomEvent.getWheelDelta(e),
             zoom = this._level;
 
-        //this._delta += delta;
-        //this._lastMousePos = this._map.mouseEventToContainerPoint(e);
-        //
-        //if (!this._startTime) {
-        //    this._startTime = +new Date();
-        //}
-        //
-        //var left = Math.max(40 - (+new Date() - this._startTime), 0);
-        //
-        //clearTimeout(this._timer);
-        //this._timer = setTimeout(L.bind(this._performZoom, this), left);
-
-        //delta = delta > 0 ? Math.ceil(delta) : Math.floor(delta);
-        //delta = Math.max(Math.min(delta, 4), -4);
         delta = delta / 8;
-        //delta = map._limitZoom(zoom + delta) - zoom;
         var newLevel = this._pyramidModel.scalingLevel(zoom, Math.pow(2, delta));
         this.setZoom(newLevel.level);
 
@@ -82962,23 +82899,11 @@ Z.Scene3D = Z.IScene.extend({
     },
 
     _onResize: function(e){
-        //this._containerWidth = this._container.clientWidth;
-        //this._containerHeight = this._container.clientHeight;
-        ////this._containerLeft = this._container.offsetLeft;
-        ////this._containerTop = this._container.offsetTop;
-        //var offsetPoint = Z.DomUtil.getOffsetPoint(this._container) || {};
-        //this._containerLeft = offsetPoint.left || 0;
-        //this._containerTop = offsetPoint.top || 0;
-        //
-        //this._sceneRender.resize();
-        //this._sceneRender.render();
         this.resize();
         this._fireMouseEvent(e);//alert("resize");
     },
 
     _onScroll: function(e){
-        //this._containerLeft = this._container.offsetLeft;
-        //this._containerTop = this._container.offsetTop;
         var offsetPoint = Z.DomUtil.getOffsetPoint(this._container) || {};
         this._containerLeft = offsetPoint.left || 0;
         this._containerTop = offsetPoint.top || 0;
@@ -83090,24 +83015,11 @@ Z.Scene3D = Z.IScene.extend({
             var latLngOffset = targetLatLng.subtract(fromLatLng);
             this._offsetLatLng(latLngOffset);
         }
-
-        //var contentBounds = this.getContentBounds(),
-        //    widthRatio = pixelOffset.x / this._container.clientWidth,
-        //    heightRatio = pixelOffset.y / this._container.clientHeight,
-        //    latLngOffsetX = (contentBounds.getEast() - contentBounds.getWest()) * widthRatio,
-        //    latLngOffsetY = -(contentBounds.getNorth() - contentBounds.getSouth()) * heightRatio;
-        //
-        //this._offsetLatLng(new Z.LatLng(latLngOffsetY, latLngOffsetX));
     },
 
     _offsetLatLng: function(latLngOffset){
-        //fromLatLng = fromLatLng || this._latLngCenter;
         var newLatLngCenter = this._latLngCenter.add(latLngOffset);
         this._centerAt(newLatLngCenter);
-        //var newLatLngCenter = fromLatLng.add(latLngOffset),
-        //    newLatLngBounds = this._latLngBounds.translate(latLngOffset.lat, latLngOffset.lng, latLngOffset.alt);
-        //
-        //this._updateSceneStatus(newLatLngCenter, newLatLngBounds);
     },
 
     _centerAt: function(centerLatLng){
@@ -83154,6 +83066,8 @@ Z.Scene3D = Z.IScene.extend({
         if(newLatLngCenter !== this._latLngCenter && newLatLngCenter instanceof Z.LatLng){
             this._latLngCenter = newLatLngCenter;
             this._projCenter = this._projModel ? this._projModel.forwardTransform(this._latLngCenter) : this._latLngCenter;
+            var newGLCenter = this._latLngToGLPoint(this._latLngCenter);
+            this._sceneRender.setViewCenter(newGLCenter);
         }
 
         if(newLatLngBounds !== this._latLngBounds && newLatLngBounds instanceof Z.LatLngBounds){
@@ -83166,17 +83080,6 @@ Z.Scene3D = Z.IScene.extend({
         this._orthoGLBounds = this._sceneRender.getOrthoGLBounds();
         this._viewableGLBounds = this._sceneRender.getVisibleGLBounds();
 
-        //if(this._projModel){
-        //    var viewableNorthEast = this._viewableLatLngBounds.getNorthEast(),
-        //    viewableSouthWest = this._viewableLatLngBounds.getSouthWest();
-        //
-        //    var projNorthEast = this._projModel.forwardTransform(viewableNorthEast),
-        //        projSouthWest = this._projModel.forwardTransform(viewableSouthWest);
-        //
-        //    this._viewableProjBounds = new Z.LatLngBounds(projNorthEast, projSouthWest);
-        //}else{
-        //    this._viewableProjBounds = this._viewableLatLngBounds;
-        //}
         this._viewableProjBounds = this._latLngBounds2ProjBounds(this._viewableLatLngBounds, this._projModel);
     },
 
@@ -83317,10 +83220,6 @@ Z.Scene3D = Z.IScene.extend({
 
         this._currentGraphics[e.type] = newGraphics;
     }
-
-    //_changeStatusVersion: function(){
-    //    this._statusVersion++;
-    //}
 });
 /**
  * Created by Administrator on 2015/10/29.
@@ -83529,6 +83428,7 @@ Z.Scene3D.Drag = Z.Class.extend({
 
         if(startPoint && newPoint){
             var delta = startPoint.subtract(newPoint);
+            // var delta = newPoint.subtract(startPoint);
             sceneObj._offsetLatLng(delta);
 
             this._lastPoint = dragEvent.newPoint;

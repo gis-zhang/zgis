@@ -119,6 +119,7 @@ Z.Scene3D.Drag = Z.Class.extend({
 
         if(startPoint && newPoint){
             var delta = startPoint.subtract(newPoint);
+            // var delta = newPoint.subtract(startPoint);
             sceneObj._offsetLatLng(delta);
 
             this._lastPoint = dragEvent.newPoint;

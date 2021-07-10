@@ -21,7 +21,7 @@ Z.SceneRender3D = function(container, options){
     this._sceneObject = null;
     this._renderObject = null;
     this._xyPlane = null;            //xy平面（z=0），用于计算地面中哪些部分显示在视域中
-    //this._viewCenter = new THREE.Vector3(0, 0, 0);
+    this._viewCenter = new THREE.Vector3(0, 0, 0);     //场景中心点
 
     this._updateChecker = [];
     this._removedUpdateChecker = [];
@@ -46,7 +46,7 @@ Z.SceneRender3D = function(container, options){
         cameraFar: 150,   //相机远面
         cameraPosition: {x: 0, y: 0, z:50},
         cameraRotation:{x:0, y: 0, z: 0},
-        cameraTarget:{x:0, y: 0, z: 0},
+        //cameraTarget:{x:0, y: 0, z: 0},
         showFrameRate: false
     };
 
@@ -158,17 +158,6 @@ Z.SceneRender3D.prototype = {
         }catch(e){
             console.error(e.message);
         }
-
-        //var thisObj = this;
-        //function _render(){
-        //    Z.RenderMonitor.update();
-        //    Z.ImageTextureManager.loadTextures();
-        //    Z.TileManager.loadImages();
-        //    Z.SingleTerrainPlane.getInstance().refresh();
-        //    thisObj._renderObject.clear();
-        //    thisObj._renderObject.render(thisObj._sceneObject, thisObj._cameraObject);
-        //    requestAnimationFrame(_render);
-        //}
     },
 
     _runRenderLoop: function(){
@@ -274,8 +263,31 @@ Z.SceneRender3D.prototype = {
         return Z.Point.create(this.options.width, this.options.height);
     },
 
+    setViewCenter: function(glCenter){
+        if(!glCenter || (!(glCenter instanceof THREE.Vector3) && !(glCenter instanceof Z.Point))){
+            return;
+        }
+
+        var pt = glCenter;
+
+        if(glCenter instanceof Z.Point){
+            pt = new THREE.Vector3(glCenter.x, glCenter.y, glCenter.z);
+        }
+
+        var offset = pt.clone().sub(this._viewCenter);
+        this._cameraObject.position.add(offset);
+        this._cameraObject.updateMatrix();
+        this._cameraObject.updateMatrixWorld(true);
+        console.info("Z.SceneRender3D.setViewCenter:camera position:(" + this._cameraObject.position.x + ", " + this._cameraObject.position.y + ", " + this._cameraObject.position.z + ")");
+
+        this._viewCenter.x = pt.x;
+        this._viewCenter.y = pt.y;
+        this._viewCenter.z = pt.z;
+    },
+
     resetCamera: function(){
         this._cameraObject = this._rawCameraObject.clone();
+        this._viewCenter.set(0, 0, 0);
         this._cameraObject.updateMatrixWorld();
     },
 
@@ -291,7 +303,8 @@ Z.SceneRender3D.prototype = {
             this._cameraObject.position.applyMatrix4(matrix);
             this._cameraObject.up.applyQuaternion(quaternion);
             //this._radRotation.set(rotate.x, rotate.y, rotate.z);
-            this._cameraObject.lookAt(new THREE.Vector3(this.options.cameraTarget.x, this.options.cameraTarget.y, this.options.cameraTarget.z));
+            //this._cameraObject.lookAt(new THREE.Vector3(this.options.cameraTarget.x, this.options.cameraTarget.y, this.options.cameraTarget.z));
+            this._cameraObject.lookAt(this._viewCenter.clone());
             //alert("rotation:" + this._cameraObject.rotation.x * 180 / Math.PI + "," + this._cameraObject.rotation.y * 180 / Math.PI + "," + this._cameraObject.rotation.z * 180 / Math.PI
             //    + ";up:" + this._cameraObject.up.x + "," + this._cameraObject.up.y + "," + this._cameraObject.up.z);
             this._cameraObject.updateMatrix();
@@ -465,14 +478,20 @@ Z.SceneRender3D.prototype = {
 
     /*垂直俯视且无z轴旋转情况下在z=0平面上的正射范围（世界坐标）*/
     getOrthoGLBounds: function(){
-        var distance = new THREE.Vector3(this.options.cameraPosition.x,
-            this.options.cameraPosition.y,
-            this.options.cameraPosition.z).length();
+        // var distance = new THREE.Vector3(this.options.cameraPosition.x,
+        //     this.options.cameraPosition.y,
+        //     this.options.cameraPosition.z).length();
+        var centerPoint = this._viewCenter;
+        //var distance = this._cameraObject.position.clone().sub(centerPoint).length();
+        var distance = this._cameraObject.position.distanceTo(centerPoint);
 
         var halfHeight = distance * Math.tan(Math.PI * this._cameraObject.fov / (2 * 180));
         var halfWidth = halfHeight * this.options.width / this.options.height;
-        var topLeft = new Z.Point(this.options.cameraPosition.x - halfWidth, this.options.cameraPosition.y + halfHeight);
-        var bottomRight = new Z.Point(this.options.cameraPosition.x + halfWidth, this.options.cameraPosition.y - halfHeight);
+        // var topLeft = new Z.Point(this.options.cameraPosition.x - halfWidth, this.options.cameraPosition.y + halfHeight);
+        // var bottomRight = new Z.Point(this.options.cameraPosition.x + halfWidth, this.options.cameraPosition.y - halfHeight);
+        
+        var topLeft = new Z.Point(centerPoint.x - halfWidth, centerPoint.y + halfHeight);
+        var bottomRight = new Z.Point(centerPoint.x + halfWidth, centerPoint.y - halfHeight);
 
         return Z.GLBounds.create(topLeft, bottomRight);
     },
@@ -480,7 +499,8 @@ Z.SceneRender3D.prototype = {
     /*当前z=0平面的可视范围（世界坐标）*/
     getVisibleGLBounds: function(){
         var raycaster = new THREE.Raycaster();
-
+        console.info("Z.SceneRender3D.getVisibleGLBounds:_cameraObject.position: x=" + this._cameraObject.position.x + ", y=" + this._cameraObject.position.y 
+            + ", z=" + this._cameraObject.position.z);
         //_getIntersectPoint: function(raycaster, targetGeometry, viewPoint, camera){
         var leftUp = this._getIntersectPoint(raycaster, this._xyPlane, new THREE.Vector2(-1, 1), this._cameraObject);
         var leftBottom = this._getIntersectPoint(raycaster, this._xyPlane, new THREE.Vector2(-1, -1), this._cameraObject);
@@ -630,9 +650,11 @@ Z.SceneRender3D.prototype = {
         }
 
         var radius = new THREE.Vector3(glBounds.max.x - glBounds.min.x, glBounds.max.y - glBounds.min.y, glBounds.max.z - glBounds.min.z).length() / 2,
-            cameraDistance = new THREE.Vector3(this.options.cameraPosition.x,
-                this.options.cameraPosition.y,
-                this.options.cameraPosition.z).length();
+            // cameraDistance = new THREE.Vector3(this.options.cameraPosition.x,
+            //     this.options.cameraPosition.y,
+            //     this.options.cameraPosition.z).length();
+            //cameraDistance = this._cameraObject.position.sub(this._viewCenter).length();
+            cameraDistance = this._cameraObject.distanceTo(this._viewCenter);
 
         var minVerticalDistance = cameraDistance * Math.sin(Math.PI * this._cameraObject.fov / (2 * 180)),
             cameraWidth = this._cameraObject.aspect * cameraDistance * Math.tan(Math.PI * this._cameraObject.fov / (2 * 180)),
@@ -647,7 +669,8 @@ Z.SceneRender3D.prototype = {
         this._cameraObject.position.x = this.options.cameraPosition.x;
         this._cameraObject.position.y = this.options.cameraPosition.y;
         this._cameraObject.position.z = this.options.cameraPosition.z;
-        this._cameraObject.lookAt(new THREE.Vector3(this.options.cameraTarget.x, this.options.cameraTarget.y, this.options.cameraTarget.z));
+        //this._cameraObject.lookAt(new THREE.Vector3(this.options.cameraTarget.x, this.options.cameraTarget.y, this.options.cameraTarget.z));
+        this._cameraObject.lookAt(this._viewCenter.clone());
         this._cameraObject.updateMatrixWorld();
         this._rawCameraObject = this._cameraObject.clone();
     },
@@ -696,8 +719,8 @@ Z.SceneRender3D.prototype = {
     _createXYPlane: function(cameraFov, cameraHeight, WHRatio){
         var halfHeight = cameraHeight * Math.tan(Math.PI * cameraFov/(2 * 180));
         var edgeLength = cameraHeight / Math.cos(Math.PI * cameraFov/(2 * 180));
-        var height = Math.max(halfHeight * 2, edgeLength) * 2;    //适度放大，确保平面大于视域范围
-        var width = height * WHRatio;
+        var height = Math.max(halfHeight * 2, edgeLength) * 100000000;    //适度放大，确保平面大于视域范围
+        var width = height * WHRatio * 100000000;
         var plane = new THREE.PlaneGeometry(width, height);
         var meterial = new THREE.MeshBasicMaterial({color:'#ffffff'});//var meterial = new THREE.MeshBasicMaterial({color:'#888800'});
         meterial.polygonOffset = true;
@@ -757,6 +780,9 @@ Z.SceneRender3D.prototype = {
             worldVertex = [],
             vector,
             vertexLength = viewPortVertex.length;
+
+        // camera.updateMatrix();
+        // camera.updateMatrixWorld();
 
         for(var i = 0; i < vertexLength; i++){
             vector = new THREE.Vector3(viewPortVertex[i][0], viewPortVertex[i][1], viewPortVertex[i][2]);

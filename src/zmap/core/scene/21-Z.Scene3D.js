@@ -317,29 +317,10 @@ Z.Scene3D = Z.IScene.extend({
     },
 
     getContentBounds: function(){
-        //var renderOrthoBounds = this._sceneRender.getOrthoGLBounds();
-        //var renderContentBounds = this._sceneRender.getVisibleGLBounds();
-        //var widthRatio = (this._latLngBounds.getEast() - this._latLngBounds.getWest()) / renderOrthoBounds.getWidth();
-        //var heightRatio = (this._latLngBounds.getNorth() - this._latLngBounds.getSouth()) / renderOrthoBounds.getHeight();
-        //var latLngWidth = renderContentBounds.getWidth() * widthRatio;
-        //var latLngHeight = renderContentBounds.getHeight() * heightRatio;
-        //var west = this._latLngCenter.lng - latLngWidth * (renderOrthoBounds.getCenter().x - renderContentBounds.getBottomLeft().x) / renderContentBounds.getWidth();
-        //var east = west + latLngWidth;
-        //var north = this._latLngCenter.lat + latLngHeight * (renderContentBounds.getTopRight().y - renderOrthoBounds.getCenter().y) / renderContentBounds.getHeight();
-        //var south = north - latLngHeight;
-        //
-        //return new Z.LatLngBounds.create(new Z.LatLng(south, west), new Z.LatLng(north, east));
         return this._viewableLatLngBounds.clone();
     },
 
-    //getContentGLBounds: function(){
-    //    return this._sceneRender.getVisibleGLBounds().clone();
-    //},
-
     getPixelSceneRatio: function(){
-        //var renderOrthoBounds = this._sceneRender.getOrthoGLBounds();
-        //var widthRatio = this._container.clientWidth / renderOrthoBounds.getWidth();
-        //var heightRatio = this._container.clientHeight / renderOrthoBounds.getHeight();
         var renderOrthoBounds = this._orthoGLBounds;
         var widthRatio = this._containerWidth / renderOrthoBounds.getWidth();
         var heightRatio = this._containerHeight / renderOrthoBounds.getHeight();
@@ -450,14 +431,6 @@ Z.Scene3D = Z.IScene.extend({
         control.onRemove(this);
     },
 
-    //setRotationByEuler: function(rotate){
-    //    if(rotate){
-    //        this._sceneRender.setRotationByEuler(rotate);
-    //        this._sceneRender.render();
-    //        this._rotation = rotate;
-    //    }
-    //},
-
     setSunLightPosition: function(sunLightPosition){
         if(sunLightPosition){
             this._sceneRender.setLightPosition(sunLightPosition);
@@ -498,9 +471,7 @@ Z.Scene3D = Z.IScene.extend({
     },
 
     refresh: function(){
-        //console.info("refresh");
         this.refreshPopup();
-        //console.info("brfore this._sceneRender.render()");
         this._sceneRender.needsUpdate = true;
         this._sceneRender.render();
     },
@@ -519,12 +490,6 @@ Z.Scene3D = Z.IScene.extend({
         this._containerWidth = newWidth;
         this._containerHeight = newHeight;
 
-        //if(Math.abs(oldWidth - this._containerWidth) < tolerance && Math.abs(oldHeight - this._containerHeight) < tolerance){
-        //    return;
-        //}
-
-        //this._containerLeft = this._container.offsetLeft;
-        //this._containerTop = this._container.offsetTop;
         var offsetPoint = Z.DomUtil.getOffsetPoint(this._container) || {};
         this._containerLeft = offsetPoint.left || 0;
         this._containerTop = offsetPoint.top || 0;
@@ -532,8 +497,6 @@ Z.Scene3D = Z.IScene.extend({
         this._viewFrame.resize();
         this._sceneRender.render();
 
-        //this._latLngBounds
-        //var newLatLngBounds = this._projBounds2LatLngBounds(newProjBounds, this._projModel);
         var latLngWidth = this._latLngBounds.getEast() - this._latLngBounds.getWest();
 
         if(Math.abs(oldWidth) > tolerance){
@@ -634,7 +597,6 @@ Z.Scene3D = Z.IScene.extend({
     _initSurfacePlane: function(){
         this._terrainPlane = Z.SingleTerrainPlane.getInstance();
         this._terrainPlane.enablePolygonOffset();
-        //this._terrainPlane.onAdd(this, this._pyramidModel, this._contentFrame.rootPane.root);
         this._terrainPlane.onAdd(this, this._pyramidModel, this._layerRoot.root);
     },
 
@@ -644,18 +606,6 @@ Z.Scene3D = Z.IScene.extend({
             this._terrainPlane = null;
         }
     },
-
-    //_initPyramidModel: function(options){
-    //    var pyramidOptions = {
-    //        //latLngBounds: this._latLngBounds.clone(),
-    //        levelDefine: options.levelDefine,
-    //        crs: options.crs
-    //    };
-    //
-    //    //this._pyramidModel = new Z.PyramidModel(pyramidOptions);
-    //    //this._pyramidModel = new Z.CustomPyramidModel(pyramidOptions);
-    //    this._pyramidModel = Z.PyramidModelFactory.create(pyramidOptions);
-    //},
 
     _initEvents: function(onOff){
         if (!Z.DomEvent) { return; }
@@ -689,22 +639,7 @@ Z.Scene3D = Z.IScene.extend({
         var delta = Z.DomEvent.getWheelDelta(e),
             zoom = this._level;
 
-        //this._delta += delta;
-        //this._lastMousePos = this._map.mouseEventToContainerPoint(e);
-        //
-        //if (!this._startTime) {
-        //    this._startTime = +new Date();
-        //}
-        //
-        //var left = Math.max(40 - (+new Date() - this._startTime), 0);
-        //
-        //clearTimeout(this._timer);
-        //this._timer = setTimeout(L.bind(this._performZoom, this), left);
-
-        //delta = delta > 0 ? Math.ceil(delta) : Math.floor(delta);
-        //delta = Math.max(Math.min(delta, 4), -4);
         delta = delta / 8;
-        //delta = map._limitZoom(zoom + delta) - zoom;
         var newLevel = this._pyramidModel.scalingLevel(zoom, Math.pow(2, delta));
         this.setZoom(newLevel.level);
 
@@ -718,23 +653,11 @@ Z.Scene3D = Z.IScene.extend({
     },
 
     _onResize: function(e){
-        //this._containerWidth = this._container.clientWidth;
-        //this._containerHeight = this._container.clientHeight;
-        ////this._containerLeft = this._container.offsetLeft;
-        ////this._containerTop = this._container.offsetTop;
-        //var offsetPoint = Z.DomUtil.getOffsetPoint(this._container) || {};
-        //this._containerLeft = offsetPoint.left || 0;
-        //this._containerTop = offsetPoint.top || 0;
-        //
-        //this._sceneRender.resize();
-        //this._sceneRender.render();
         this.resize();
         this._fireMouseEvent(e);//alert("resize");
     },
 
     _onScroll: function(e){
-        //this._containerLeft = this._container.offsetLeft;
-        //this._containerTop = this._container.offsetTop;
         var offsetPoint = Z.DomUtil.getOffsetPoint(this._container) || {};
         this._containerLeft = offsetPoint.left || 0;
         this._containerTop = offsetPoint.top || 0;
@@ -846,24 +769,11 @@ Z.Scene3D = Z.IScene.extend({
             var latLngOffset = targetLatLng.subtract(fromLatLng);
             this._offsetLatLng(latLngOffset);
         }
-
-        //var contentBounds = this.getContentBounds(),
-        //    widthRatio = pixelOffset.x / this._container.clientWidth,
-        //    heightRatio = pixelOffset.y / this._container.clientHeight,
-        //    latLngOffsetX = (contentBounds.getEast() - contentBounds.getWest()) * widthRatio,
-        //    latLngOffsetY = -(contentBounds.getNorth() - contentBounds.getSouth()) * heightRatio;
-        //
-        //this._offsetLatLng(new Z.LatLng(latLngOffsetY, latLngOffsetX));
     },
 
     _offsetLatLng: function(latLngOffset){
-        //fromLatLng = fromLatLng || this._latLngCenter;
         var newLatLngCenter = this._latLngCenter.add(latLngOffset);
         this._centerAt(newLatLngCenter);
-        //var newLatLngCenter = fromLatLng.add(latLngOffset),
-        //    newLatLngBounds = this._latLngBounds.translate(latLngOffset.lat, latLngOffset.lng, latLngOffset.alt);
-        //
-        //this._updateSceneStatus(newLatLngCenter, newLatLngBounds);
     },
 
     _centerAt: function(centerLatLng){
@@ -910,6 +820,8 @@ Z.Scene3D = Z.IScene.extend({
         if(newLatLngCenter !== this._latLngCenter && newLatLngCenter instanceof Z.LatLng){
             this._latLngCenter = newLatLngCenter;
             this._projCenter = this._projModel ? this._projModel.forwardTransform(this._latLngCenter) : this._latLngCenter;
+            var newGLCenter = this._latLngToGLPoint(this._latLngCenter);
+            this._sceneRender.setViewCenter(newGLCenter);
         }
 
         if(newLatLngBounds !== this._latLngBounds && newLatLngBounds instanceof Z.LatLngBounds){
@@ -922,17 +834,6 @@ Z.Scene3D = Z.IScene.extend({
         this._orthoGLBounds = this._sceneRender.getOrthoGLBounds();
         this._viewableGLBounds = this._sceneRender.getVisibleGLBounds();
 
-        //if(this._projModel){
-        //    var viewableNorthEast = this._viewableLatLngBounds.getNorthEast(),
-        //    viewableSouthWest = this._viewableLatLngBounds.getSouthWest();
-        //
-        //    var projNorthEast = this._projModel.forwardTransform(viewableNorthEast),
-        //        projSouthWest = this._projModel.forwardTransform(viewableSouthWest);
-        //
-        //    this._viewableProjBounds = new Z.LatLngBounds(projNorthEast, projSouthWest);
-        //}else{
-        //    this._viewableProjBounds = this._viewableLatLngBounds;
-        //}
         this._viewableProjBounds = this._latLngBounds2ProjBounds(this._viewableLatLngBounds, this._projModel);
     },
 
@@ -1073,8 +974,4 @@ Z.Scene3D = Z.IScene.extend({
 
         this._currentGraphics[e.type] = newGraphics;
     }
-
-    //_changeStatusVersion: function(){
-    //    this._statusVersion++;
-    //}
 });

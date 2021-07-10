@@ -285,9 +285,9 @@ Z.SurfacePlane = Z.Class.extend({
         var thisObj = this;
         this._scene[onOff]("viewreset", thisObj._onViewReset, thisObj);
         this._scene[onOff]("zoomlevelschange", thisObj._onZoomChange, thisObj);
-        this._scene[onOff]("dragstart", thisObj._onDragStart, thisObj);
-        this._scene[onOff]("drag", this._onDrag, thisObj);
-        this._scene[onOff]("dragend", thisObj._onDragEnd, thisObj);
+        // this._scene[onOff]("dragstart", thisObj._onDragStart, thisObj);
+        // this._scene[onOff]("drag", this._onDrag, thisObj);
+        // this._scene[onOff]("dragend", thisObj._onDragEnd, thisObj);
     },
 
     _onViewReset: function(e){
@@ -382,8 +382,8 @@ Z.SurfacePlane = Z.Class.extend({
     _getRenderTileSize: function(tilePoint){
         //var tileLatLngBounds = this._pyramidModel.getLatLngBounds(tilePoint, this._scene.getZoom()),
         var tileLatLngBounds = this._pyramidModel.getLatLngBounds(tilePoint, tilePoint.z),
-            southWest = this._scene._latLngToGLPoint(tileLatLngBounds.getSouthWest()),
-            northEast = this._scene._latLngToGLPoint(tileLatLngBounds.getNorthEast());
+            southWest = this._scene.latLngToScenePoint(tileLatLngBounds.getSouthWest()),
+            northEast = this._scene.latLngToScenePoint(tileLatLngBounds.getNorthEast());
 
         return new Z.Point(Math.abs(southWest.x - northEast.x), Math.abs(southWest.y - northEast.y));
     },
@@ -404,7 +404,7 @@ Z.SurfacePlane = Z.Class.extend({
             south = tileLatLngBounds_max.getSouth(),
             east = tileLatLngBounds_max.getEast();
 
-        return this._scene._latLngToGLPoint(new Z.LatLng((south + north)/2, (east + west)/2));
+        return this._scene.latLngToScenePoint(new Z.LatLng((south + north)/2, (east + west)/2));
     },
 
     _updateTileTexture: function(texture, tileBounds, level){
