@@ -43,7 +43,7 @@ Z.SceneRender3D = function(container, options){
         fogColor:'#f2f7ff',
         cameraFov: 45,    //相机视场,单位为角度
         cameraNear: 1,  //相机近面
-        cameraFar: 150,   //相机远面
+        cameraFar: 100,   //相机远面
         cameraPosition: {x: 0, y: 0, z:50},
         cameraRotation:{x:0, y: 0, z: 0},
         //cameraTarget:{x:0, y: 0, z: 0},
@@ -607,10 +607,11 @@ Z.SceneRender3D.prototype = {
     getIntersectObjects: function(screenPoint){
         var halfWidth = this.options.width / 2,
             halfHeight = this.options.height / 2,
-            raycaster = new THREE.Raycaster(),
+            //raycaster = new THREE.Raycaster(),
             vector = new THREE.Vector3((screenPoint.x - halfWidth) / halfWidth, (halfHeight - screenPoint.y) / halfHeight, 0);
 
-        raycaster.setFromCamera( vector, this._cameraObject);
+        //raycaster.setFromCamera( vector, this._cameraObject);
+        var raycaster = this._getNearFarRayCaster(vector, this._cameraObject);
         var intersects = raycaster.intersectObjects( this._sceneObject.children, true),
             graphics = [], j = 0;
         // console.info("intersectObjects:" + intersects.length);
@@ -719,9 +720,11 @@ Z.SceneRender3D.prototype = {
     _createXYPlane: function(cameraFov, cameraHeight, WHRatio){
         var halfHeight = cameraHeight * Math.tan(Math.PI * cameraFov/(2 * 180));
         var edgeLength = cameraHeight / Math.cos(Math.PI * cameraFov/(2 * 180));
-        var height = Math.max(halfHeight * 2, edgeLength) * 100000000;    //适度放大，确保平面大于视域范围
-        var width = height * WHRatio * 100000000;
+        var height = Math.max(halfHeight * 2, edgeLength) * 1000000;    //适度放大，确保平面大于视域范围
+        var width = height * WHRatio * 1000000;
         var plane = new THREE.PlaneGeometry(width, height);
+        plane.computeVertexNormals();
+        // plane.normalizeNormals();
         var meterial = new THREE.MeshBasicMaterial({color:'#ffffff'});//var meterial = new THREE.MeshBasicMaterial({color:'#888800'});
         meterial.polygonOffset = true;
         meterial.polygonOffsetFactor = -1;
@@ -761,7 +764,8 @@ Z.SceneRender3D.prototype = {
     },
 
     _getIntersectPoint: function(raycaster, targetGeometry, viewPoint, camera){
-        raycaster.setFromCamera( viewPoint, camera );
+        // raycaster.setFromCamera( viewPoint, camera );
+        this._getNearFarRayCaster(viewPoint, camera, raycaster);
 
         var intersects = [];
         targetGeometry.raycast(raycaster, intersects);
@@ -775,8 +779,8 @@ Z.SceneRender3D.prototype = {
 
     //获得相机可视区域的外围框（凌锥形）
     _getCameraBox: function(camera){
-        var viewPortVertex = [[-1,1,-1], [-1,-1,-1], [1,-1,-1], [1,1,-1],
-            [-1,1,1], [-1,-1,1], [1,-1,1], [1,1,1]],
+        var viewPortVertex = [[-1,1,-1], [-1,-1,-1], [1,-1,-1], [1,1,-1], [-1,1,-1], 
+            [-1,1,1], [-1,-1,1], [1,-1,1], [1,1,1], [-1,1,1], [-1,1,-1]],
             worldVertex = [],
             vector,
             vertexLength = viewPortVertex.length;
@@ -789,6 +793,31 @@ Z.SceneRender3D.prototype = {
             worldVertex[i] = vector.unproject(camera);
         }
 
-        return new THREE.ConvexGeometry(worldVertex);
+        //return new THREE.ConvexGeometry(worldVertex);
+        var geometry = new THREE.ConvexGeometry(worldVertex);
+        geometry.computeVertexNormals ();
+        // geometry.normalizeNormals();
+
+        return geometry;
+    },
+
+    _getNearFarRayCaster: function(viewPoint, camera, targetRayCaster){
+        var raycaster = targetRayCaster || new THREE.Raycaster();
+        raycaster.setFromCamera( viewPoint, camera);
+
+        var nearDistance = this._getCameraDistance(camera.near, camera);
+        var farDistance = this._getCameraDistance(camera.far, camera);
+        raycaster.near = nearDistance;
+        raycaster.far = farDistance;
+
+        return raycaster;
+    },
+
+    _getCameraDistance: function(verticalDis, camera){
+        var x = verticalDis;
+        var y = x * Math.tan(camera.fov * Math.PI/ 180);
+        var z = y * camera.aspect;
+
+        return Math.sqrt(x * x + y * y + z * z);
     }
 }

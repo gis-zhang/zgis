@@ -31,7 +31,8 @@ module.exports = function(grunt) {
             threeLib: {
                 src: ['src/lib/threejs_new2/three.js',
                     'src/lib/threejs/ConvexGeometry.js',
-                    'src/lib/threebsp/ThreeBSP.js',
+                    //'src/lib/threebsp/ThreeBSP.js',
+                    'src/lib/threebsp/index.js',
                     'src/lib/threejs-ext/loaders/DDSLoader.js',
                     'src/lib/threejs-ext/loaders/MTLLoader.js',
                     'src/lib/threejs-ext/loaders/OBJLoader.js',
